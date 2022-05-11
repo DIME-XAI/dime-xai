@@ -1,0 +1,47 @@
+{% extends 'error/dime_error_base.html'%}
+{% block title %}
+    DIME Dashboard
+{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/ghost.css') }}" xmlns="http://www.w3.org/1999/html">
+{% endblock %}
+{% block content %}
+<div class="ghost-canvas">
+    <div class="ghost-body" data-parallaxify-range-x="100" data-parallaxify-range-y="50" data-parallaxify-background-range="100">
+        <div class="ghost-body-copy">
+
+        </div>
+        <div class="ghost-head">
+            <div class="eye-left"></div>
+            <div class="eye-right"></div>
+            <div class="mouth"></div>
+        </div>
+        <div class="down-bubble">
+            <div class="bubble-1"></div>
+            <div class="bubble-2"></div>
+            <div class="bubble-3"></div>
+            <div class="bubble-4"></div>
+        </div>
+    </div>
+</div>
+
+<div class="container text-center" data-parallaxify-range-x="100" style="width: 500px;">
+    <div class="error-text-canvas">
+        <h2 class="error-font">{{ title }}</h2>
+        <p class="error-message-para">{{ error }}</p>
+        <a href="{{ url_for('dashboard') }}">
+            <button type="button" class="btn btn btn-danger fw-bold error-back-btn">
+                <span class="material-icons material-icons-outlined" style="font-size:30px;color: white">
+                    swap_horiz
+                </span>
+                Take me somewhere I know
+            </button>
+        </a>
+    </div>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+    $.parallaxify();
+</script>
+{% endblock %}

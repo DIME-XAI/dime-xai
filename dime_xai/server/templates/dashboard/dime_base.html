@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/dime_styles.css') }}">
+    <link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link href='https://fonts.googleapis.com/css?family=JetBrains Mono' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Rubik' rel='stylesheet'>
+    <link href="{{ url_for('static', filename='styles/bootstrap.min.css') }}" rel="stylesheet" />
+    <!-- favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='images/dime_smsq_dark_e.png') }}" type="image/png">
+
+    <title> {% block title %} {% endblock %} </title>
+    {% block metadata %} {% endblock %}
+    {% block styles %} {% endblock %}
+</head>
+<body class="user-select-none">
+    <input type="checkbox" id="dark-mode-switch">
+    <input style="margin-left: 350px; background-color: #3dd5f3" type="checkbox" id="dark-mode-switch-base" class="dark-mode-checkbox">
+    <div id="mySidebar" class="sidebar sidebar-dark" onmouseover="toggleSidebar()" onmouseout="toggleSidebar()">
+        <div class="container sidebar-logo-container">
+          <div class="row">
+            <div class="span4"></div>
+                <div class="span4 text-center">
+                    <img class="center-block sidebar-logo" src="{{ url_for('static', filename='images/dime_smsq_dark_e.png') }}" alt=" "  onerror="this.style.display='none'"/>
+                </div>
+            <div class="span4"></div>
+          </div>
+        </div>
+        <a href="javascript:showSidebarContent('dashboard')" class="sidebar-link ripple-button" id="sidebar-dash">
+            <span class="material-icons">
+                code
+            </span>
+            <span class="icon-text">
+                Dashboard
+            </span>
+        </a>
+        <br>
+        <a href="javascript:showSidebarContent('instructions')" class="sidebar-link ripple-button" id="sidebar-instructions">
+            <span class="material-icons">
+                integration_instructions
+            </span>
+            <span class="icon-text">
+                Instructions
+            </span>
+        </a>
+        <br>
+        <label for="dark-mode-switch" class="sidebar-link ripple-button" id="sidebar-dark-mode">
+                <span class="material-icons" id="sidebar-dark-mode-icon">
+                    dark_mode
+                </span>
+                <span class="icon-text">
+                    Dark Mode
+                </span>
+        </label>
+    </div>
+    {% block sidebar %} {% endblock %}
+    <input style="margin-left: 350px; background-color: #3dd5f3" type="checkbox" id="dark-mode-switch-main" class="dark-mode-checkbox">
+    <div id="main" class="bg-main">
+    {% block content %} {% endblock %}
+    </div>
+
+    <script src="{{ url_for('static', filename='scripts/dime_main.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='scripts/jquery-3.6.0.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='scripts/bootstrap.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='scripts/jquery.parallaxify.min.js') }}"></script>
+    <script>
+        $.parallaxify();
+
+        $( document ).ready(function() {
+            const side_buttons = document.getElementsByClassName("ripple-button");
+            for (const side_button of side_buttons) {
+              side_button.addEventListener("click", createRipple);
+            }
+
+            // enable this to make dark mode the default theme when the page is loaded
+            // enableDarkMode();
+        });
+
+        function createRipple(event) {
+            const button = event.currentTarget;
+
+            const circle = document.createElement("span");
+            const diameter = Math.max(button.clientWidth, button.clientHeight);
+            const radius = diameter / 2;
+
+            circle.style.width = circle.style.height = `${diameter}px`;
+            circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
+            circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
+            circle.classList.add("ripple");
+
+            const ripple = button.getElementsByClassName("ripple")[0];
+
+            if (ripple) {
+            ripple.remove();
+            }
+
+            button.appendChild(circle);
+        }
+
+        // dark mode trigger
+        $("#dark-mode-switch").click(function () {
+            $("input.dark-mode-checkbox:checkbox").not(this).prop('checked', this.checked);
+        });
+
+        function enableDarkMode() {
+            $( "#dark-mode-switch" ).prop( "checked", false );
+            $( "#dark-mode-switch" ).click();
+        }
+
+        function enableLightMode() {
+            $( "#dark-mode-switch" ).prop( "checked", true );
+            $( "#dark-mode-switch" ).click();
+        }
+
+    </script>
+    {% block script %} {% endblock %}
+</body>
+</html>

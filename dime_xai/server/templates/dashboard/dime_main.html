@@ -1,0 +1,285 @@
+{% extends 'dashboard/dime_base.html'%}
+{% block title %}
+    DIME Dashboard
+{% endblock %}
+{% block sidebar %}
+{% endblock %}
+{% block content %}
+    <div class="main-section m-0 p-0" id="main-section-dashboard">
+      <div class="row align-items-md-stretch dime-page-title">
+          <h4 class="m-0 ms-1 p-0 "><strong>Dashboard</strong></h4>
+      </div>
+
+      <div class="row align-items-md-stretch">
+          <div class="h-100 p-5 shadow container-top container-bg-custom dime-material-red">
+              <h2>Dime Server</h2>
+              <p>Generates DIET Explanations for Rasa.</p>
+              <p>This version of DIME Server supports Rasa 2.8.X. models only.</p>
+          </div>
+      </div>
+
+      <div class="row align-items-md-stretch">
+        <div class="p-3 shadow-sm container-middle container-bg">
+          <div class="input-group mb-3 input-group-dark">
+            <span class="input-group-text" id="basic-addon1">@</span>
+            <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
+          </div>
+
+          <div class="input-group mb-3 input-group-dark">
+            <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
+            <span class="input-group-text" id="basic-addon2">@example.com</span>
+          </div>
+
+          <label for="basic-url" class="form-label">Your vanity URL</label>
+          <div class="input-group mb-3 input-group-dark">
+            <span class="input-group-text" id="basic-addon3">https://example.com/users/</span>
+            <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3">
+          </div>
+
+          <div class="input-group mb-3 input-group-dark">
+            <span class="input-group-text">$</span>
+            <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+            <span class="input-group-text">.00</span>
+          </div>
+
+          <div class="input-group mb-3 input-group-dark">
+            <input type="text" class="form-control" placeholder="Username" aria-label="Username">
+            <span class="input-group-text">@</span>
+            <input type="text" class="form-control" placeholder="Server" aria-label="Server">
+          </div>
+
+          <div class="input-group input-group-dark">
+            <span class="input-group-text">With textarea</span>
+            <textarea class="form-control" aria-label="With textarea"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="row align-items-md-stretch">
+        <div class="p-3 shadow-sm container-middle container-bg">
+          <h6 class="border-bottom pb-2 mb-0">Recent updates</h6>
+          <div class="d-flex text-muted pt-3">
+            <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"/><text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text></svg>
+
+            <p class="pb-3 mb-0 small lh-sm border-bottom">
+              <strong class="d-block text-gray-dark">@username</strong>
+              Some representative placeholder content, with some information about this user. Imagine this being some sort of status update, perhaps?
+            </p>
+          </div>
+          <div class="d-flex text-muted pt-3">
+            <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#e83e8c"/><text x="50%" y="50%" fill="#e83e8c" dy=".3em">32x32</text></svg>
+
+            <p class="pb-3 mb-0 small lh-sm border-bottom">
+              <strong class="d-block text-gray-dark">@username</strong>
+              Some more representative placeholder content, related to this other user. Another status update, perhaps.
+            </p>
+          </div>
+          <div class="d-flex text-muted pt-3">
+            <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#6f42c1"/><text x="50%" y="50%" fill="#6f42c1" dy=".3em">32x32</text></svg>
+
+            <p class="pb-3 mb-0 small lh-sm border-bottom">
+              <strong class="d-block text-gray-dark">@username</strong>
+              This user also gets some representative placeholder content. Maybe they did something interesting, and you really want to highlight this in the recent updates.
+            </p>
+          </div>
+          <small class="d-block text-end mt-3">
+            <a href="#">All updates</a>
+          </small>
+        </div>
+      </div>
+
+      <div class="row align-items-md-stretch">
+        <div class="p-3 shadow-sm container-end container-bg">
+          <h6 class="border-bottom pb-2 mb-0">Suggestions</h6>
+          <div class="d-flex text-muted pt-3">
+            <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"></rect><text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text></svg>
+
+            <div class="pb-3 mb-0 small lh-sm border-bottom w-100">
+              <div class="d-flex justify-content-between">
+                <strong class="text-gray-dark">Full Name</strong>
+                <a href="#">Follow</a>
+              </div>
+              <span class="d-block">@username</span>
+            </div>
+          </div>
+          <div class="d-flex text-muted pt-3">
+            <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"></rect><text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text></svg>
+
+            <div class="pb-3 mb-0 small lh-sm border-bottom w-100">
+              <div class="d-flex justify-content-between">
+                <strong class="text-gray-dark">Full Name</strong>
+                <a href="#">Follow</a>
+              </div>
+              <span class="d-block">@username</span>
+            </div>
+          </div>
+          <div class="d-flex text-muted pt-3">
+            <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"></rect><text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text></svg>
+
+            <div class="pb-3 mb-0 small lh-sm border-bottom w-100">
+              <div class="d-flex justify-content-between">
+                <strong class="text-gray-dark">Full Name</strong>
+                <a href="#">Follow</a>
+              </div>
+              <span class="d-block">@username</span>
+            </div>
+          </div>
+          <small class="d-block text-end mt-3">
+            <a href="#">All suggestions</a>
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-section m-0 p-0 " id="main-section-instructions">
+      <div class="row align-items-md-stretch dime-page-title">
+          <h4 class="m-0 ms-1 p-0 "><strong>Instructions</strong></h4>
+      </div>
+
+      <div class="row align-items-md-stretch">
+          <div class="h-100 p-5 shadow container-top container-bg-custom dime-material-blue">
+              <h2>Dime Server Instructions</h2>
+              <p>Generates DIET Explanations for Rasa.</p>
+              <p>This version of DIME Server supports Rasa 2.8.X. models only.</p>
+          </div>
+      </div>
+
+      <div class="row align-items-md-stretch">
+        <div class="p-3 shadow-sm container-middle container-bg">
+          <div class="input-group mb-3 input-group-dark">
+            <span class="input-group-text" id="basic-addon4">@</span>
+            <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
+          </div>
+
+          <div class="input-group mb-3 input-group-dark">
+            <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
+            <span class="input-group-text" id="basic-addon5">@example.com</span>
+          </div>
+
+          <label for="basic-url" class="form-label">Your vanity URL</label>
+          <div class="input-group mb-3 input-group-dark">
+            <span class="input-group-text" id="basic-addon6">https://example.com/users/</span>
+            <input type="text" class="form-control" id="basic-url1" aria-describedby="basic-addon3">
+          </div>
+
+          <div class="input-group mb-3 input-group-dark">
+            <span class="input-group-text">$</span>
+            <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+            <span class="input-group-text">.00</span>
+          </div>
+
+          <div class="input-group mb-3 input-group-dark">
+            <input type="text" class="form-control" placeholder="Username" aria-label="Username">
+            <span class="input-group-text">@</span>
+            <input type="text" class="form-control" placeholder="Server" aria-label="Server">
+          </div>
+
+          <div class="input-group input-group-dark">
+            <span class="input-group-text">With textarea</span>
+            <textarea class="form-control" aria-label="With textarea"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="row align-items-md-stretch">
+        <div class="p-3 shadow-sm container-middle container-bg">
+          <h6 class="border-bottom pb-2 mb-0">Recent updates</h6>
+          <div class="d-flex text-muted pt-3">
+            <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"/><text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text></svg>
+
+            <p class="pb-3 mb-0 small lh-sm border-bottom">
+              <strong class="d-block text-gray-dark">@username</strong>
+              Some representative placeholder content, with some information about this user. Imagine this being some sort of status update, perhaps?
+            </p>
+          </div>
+          <div class="d-flex text-muted pt-3">
+            <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#e83e8c"/><text x="50%" y="50%" fill="#e83e8c" dy=".3em">32x32</text></svg>
+
+            <p class="pb-3 mb-0 small lh-sm border-bottom">
+              <strong class="d-block text-gray-dark">@username</strong>
+              Some more representative placeholder content, related to this other user. Another status update, perhaps.
+            </p>
+          </div>
+          <div class="d-flex text-muted pt-3">
+            <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#6f42c1"/><text x="50%" y="50%" fill="#6f42c1" dy=".3em">32x32</text></svg>
+
+            <p class="pb-3 mb-0 small lh-sm border-bottom">
+              <strong class="d-block text-gray-dark">@username</strong>
+              This user also gets some representative placeholder content. Maybe they did something interesting, and you really want to highlight this in the recent updates.
+            </p>
+          </div>
+          <small class="d-block text-end mt-3">
+            <a href="#">All updates</a>
+          </small>
+        </div>
+      </div>
+
+      <div class="row align-items-md-stretch">
+        <div class="p-3 shadow-sm container-end container-bg">
+          <h6 class="border-bottom pb-2 mb-0">Suggestions</h6>
+          <div class="d-flex text-muted pt-3">
+            <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"></rect><text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text></svg>
+
+            <div class="pb-3 mb-0 small lh-sm border-bottom w-100">
+              <div class="d-flex justify-content-between">
+                <strong class="text-gray-dark">Full Name</strong>
+                <a href="#">Follow</a>
+              </div>
+              <span class="d-block">@username</span>
+            </div>
+          </div>
+          <div class="d-flex text-muted pt-3">
+            <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"></rect><text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text></svg>
+
+            <div class="pb-3 mb-0 small lh-sm border-bottom w-100">
+              <div class="d-flex justify-content-between">
+                <strong class="text-gray-dark">Full Name</strong>
+                <a href="#">Follow</a>
+              </div>
+              <span class="d-block">@username</span>
+            </div>
+          </div>
+          <div class="d-flex text-muted pt-3">
+            <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"></rect><text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text></svg>
+
+            <div class="pb-3 mb-0 small lh-sm border-bottom w-100">
+              <div class="d-flex justify-content-between">
+                <strong class="text-gray-dark">Full Name</strong>
+                <a href="#">Follow</a>
+              </div>
+              <span class="d-block">@username</span>
+            </div>
+          </div>
+          <small class="d-block text-end mt-3">
+            <a href="#">All suggestions</a>
+          </small>
+        </div>
+      </div>
+    </div>
+
+{% endblock %}
+{% block script %}
+  <script>
+    $( document ).ready(function() {
+      showSidebarContent("dashboard");
+    });
+
+    function showSidebarContent(content) {
+      if (content === "dashboard") {
+        $(".sidebar-link").removeClass("active");
+        $("#sidebar-dash").addClass("active");
+        $(".main-section").fadeOut();
+        $("#main-section-dashboard").fadeIn("slow");
+      } else if (content === "instructions") {
+        $(".sidebar-link").removeClass("active");
+        $("#sidebar-instructions").addClass("active");
+        $(".main-section").fadeOut();
+        $("#main-section-instructions").fadeIn("slow");
+      }
+
+      $('html, body').animate({
+        scrollTop: $('#main').offset().top - 20
+      }, 'slow');
+    }
+  </script>
+{% endblock %}

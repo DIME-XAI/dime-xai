@@ -1,0 +1,2 @@
+class DIMEBaseException(Exception):
+    pass

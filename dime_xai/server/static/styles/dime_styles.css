@@ -1,0 +1,408 @@
+body {
+    /*font-family: "Rubik", sans-serif !important;*/
+    font-family: 'Rubik', -apple-system, BlinkMacSystemFont,
+    "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans",
+    "Droid Sans", "Helvetica Neue", sans-serif !important;
+}
+
+.dime-page-title {
+    margin-bottom: 20px;
+    color: white;
+    transition: all 2s ease;
+}
+
+body #main {
+    background-color: #161414;
+    color: white;
+    transition: background-color .3s ease, margin-left .5s, padding-left .5s;
+    padding: 20px 36px 20px;
+    margin-left: 85px;
+    min-height: 100vh;
+}
+
+.main-section {
+    transition: .3s ease;
+}
+
+.container-top {
+    margin-top: 4px !important;
+    margin-bottom: 12px !important;
+}
+
+.container-middle {
+    margin-top: 12px !important;
+    margin-bottom: 12px !important;
+}
+
+/*.container-middle h6 {*/
+/*    border-color: #818181 !important;*/
+/*}*/
+
+.container-end {
+    margin-top: 12px !important;
+    margin-bottom: 6px !important;
+}
+
+.container-bg {
+    background-color: #212121 !important;
+    color: white !important;
+    /*border: 2px solid #424242 !important;*/
+    border-radius: 10px;
+    transition: background-color .3s ease;
+}
+
+.container-bg-custom {
+    background-color: #212121 !important;
+    color: white !important;
+    /*border: 2px solid #424242 !important;*/
+    border-radius: 10px;
+    transition: background-color .3s ease;
+}
+
+/*.container-border {*/
+/*    border: 2px solid #424242 !important;*/
+/*}*/
+
+.sidebar-logo-container {
+    margin: 15px 0 20px 0;
+}
+
+.sidebar-logo {
+    width: 30px;
+}
+
+.sidebar {
+    height: 100%;
+    width: 85px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 10px;
+    white-space: nowrap;
+}
+
+.sidebar-dark {
+    background-color: #212121 !important;
+    color: white;
+}
+
+.sidebar a,
+.sidebar #sidebar-dark-mode {
+    padding: 8px 2px 8px 16px;
+    text-decoration: none;
+    font-family: 'Rubik', 'Lato', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+    margin: 0 16px 0;
+    background-color: transparent;
+}
+
+.sidebar a:hover,
+.sidebar #sidebar-dark-mode:hover {
+    color: #f1f1f1;
+    background-color: #424242;
+    border-radius: 10px;
+    margin: 0 26px 0;
+}
+
+#sidebar-dark-mode-icon {
+    color: #FFC107;
+}
+
+.sidebar .active {
+    color: #f1f1f1;
+}
+
+.icon-text {
+    margin-left: 28px;
+    transition: visibility 230ms;
+}
+
+.sidebar .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+.material-icons,
+.icon-text {
+    vertical-align: middle;
+}
+
+.material-icons {
+    padding-bottom: 3px;
+    font-size:30px;
+}
+
+/*.material-icons:hover {*/
+/*    color: #C5CAE9 !important;*/
+/*}*/
+
+.input-group-dark input,
+.input-group-dark .form-control{
+    background-color: #323232 !important;
+    border-color: transparent !important;
+    color: white !important;
+    transition: 0.3s;
+}
+
+.input-group-dark .input-group-text{
+    background-color: #43A047 !important;
+    border-color: transparent !important;
+    color: white !important;
+}
+
+/*textarea:focus,*/
+/*input[type="text"]:focus,*/
+/*input[type="password"]:focus,*/
+/*input[type="datetime"]:focus,*/
+/*input[type="datetime-local"]:focus,*/
+/*input[type="date"]:focus,*/
+/*input[type="month"]:focus,*/
+/*input[type="time"]:focus,*/
+/*input[type="week"]:focus,*/
+/*input[type="number"]:focus,*/
+/*input[type="email"]:focus,*/
+/*input[type="url"]:focus,*/
+/*input[type="search"]:focus,*/
+/*input[type="tel"]:focus,*/
+/*input[type="color"]:focus,*/
+/*textarea,*/
+/*.uneditable-input:focus {*/
+/*    border: 3px solid #81C784 !important;*/
+/*    box-shadow: 0 0px 0px rgba(0, 0, 0, 0.075) inset, 0 0 0px rgba(67, 160, 71, 0.6);*/
+/*    border-color: rgba(0, 0, 0, 0.8);*/
+/*    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(0, 0, 0, 0.6);*/
+/*    outline: 0 none;*/
+/*}*/
+
+/*ripple effect*/
+.ripple-button {
+    position: relative;
+    overflow: hidden;
+    transition: background 400ms;
+    color: #fff;
+    background-color: #212121;
+    padding: 1rem 2rem;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.5rem;
+    outline: 0;
+    border: 0;
+    border-radius: 0.25rem;
+}
+
+span.ripple {
+    position: absolute;
+    border-radius: 50%;
+    transform: scale(0);
+    animation: ripple 600ms linear;
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+@keyframes ripple {
+    to {
+    transform: scale(4);
+    opacity: 0;
+    }
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+    .sidebar {
+        padding-top: 15px;
+    }
+    .sidebar a, .sidebar #sidebar-dark-mode {
+        font-size: 18px;
+    }
+}
+
+#main label {
+    color: blue;
+    background-color: violet;
+    transition: all 2s ease;
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+/*ERROR PAGE STYLES*/
+.error-main-bg {
+    background-color: #111;
+    color: #f0f0f0;
+}
+
+.error-text-canvas {
+    width: 100%;
+}
+
+.error-font {
+    font-family: 'Rubik', 'Lato', sans-serif;
+    font-weight: 600;
+    color: white;
+}
+
+.error-message-para {
+    margin-bottom: 20px;
+    color: white;
+}
+
+.error-back-btn:hover {
+    transition-property: box-shadow;
+    box-shadow: 6px 6px 200px rgba(244, 67, 54, 0.8);
+}
+/*ERROR PAGE STYLES END*/
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+/*DARK MODE STARTS*/
+input[type=checkbox] {
+  display: none;
+}
+
+#dark-mode-switch-base:checked + div #sidebar-dark-mode-icon {
+    color: #818181;
+}
+
+#dark-mode-switch-main:checked + .bg-main {
+    background-color: #BDBDBD;
+    color: black;
+}
+
+#dark-mode-switch-main:checked + #main label {
+    color: black;
+    background-color: transparent;
+}
+
+#dark-mode-switch-main:checked + #main .container-bg {
+    background-color: #f1f1f1 !important;
+    color: black !important;
+    /*border: 2px solid #424242 !important;*/
+}
+
+#dark-mode-switch-main:checked + #main .dime-page-title {
+    color: #040404;
+}
+
+#dark-mode-switch-main:checked + #main .input-group-dark input,
+#dark-mode-switch-main:checked + #main .input-group-dark .form-control{
+    background-color: white !important;
+    border-color: transparent !important;
+    color: #252525 !important;
+}
+
+#dark-mode-switch-main:checked + #main .input-group-dark .input-group-text{
+    background-color: #43A047 !important;
+    border-color: transparent !important;
+    color: white !important;
+}
+/*DARK MODE ENDS*/
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+/*DIME COLORS START*/
+.dime-material-blue {
+    background-color: #03A9F4 !important;
+}
+
+.dime-material-pink {
+    background-color: #F06292 !important;
+}
+
+.dime-material-red {
+    background-color: #EF5350 !important;
+}
+
+.dime-material-dark-red {
+    background-color: #F44336 !important;
+}
+
+.dime-material-yellow {
+    background-color: #FFC107 !important;
+}
+
+.dime-material-orange {
+    background-color: #FF9800 !important;
+}
+
+.dime-material-brown {
+    background-color: #6D4C41 !important;
+}
+
+.dime-material-green {
+    background-color: #6D4C41 !important;
+}
+
+.dime-material-purple {
+    background-color: #9C27B0 !important;
+}
+
+.dime-material-jet-black {
+    background-color: #343434 !important;
+}
+
+.dime-material-matt-black {
+    background-color: #28282B !important;
+}
+
+.dime-material-onyx {
+    background-color: #353935 !important;
+}
+
+.dime-material-steel-gray {
+    background-color: #71797E !important;
+}
+
+.dime-material-white {
+    background-color: #FFFFFF !important;
+}
+
+.dime-material-alabaster {
+    background-color: #EDEADE !important;
+}
+
+.dime-material-bone-white {
+    background-color: #F9F6EE !important;
+}
+
+.dime-material-off-white {
+    background-color: #FAF9F6 !important;
+}
+
+.dime-material-almond {
+    background-color: #EADDCA !important;
+}
+
+.dime-material-lavender {
+    background-color: #E6E6FA !important;
+}
+
+.dime-material-silver {
+    background-color: #C0C0C0 !important;
+}
+
+.dime-material-platinum {
+    background-color: #E5E4E2 !important;
+}
+
+.dime-material-light-gray {
+    background-color: #D3D3D3 !important;
+}
+
+.dime-material-smoke {
+    background-color: #848884 !important;
+}
+
+.dime-material-charcoal {
+    background-color: #36454F !important;
+}
+
+.dime-material-licorice {
+    background-color: #1B1212 !important;
+}
+/*DIME COLORS END*/
+
