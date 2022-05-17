@@ -29,7 +29,11 @@ DEFAULT_CACHE_PATH = "./.dime_cache"
 
 # fingerprinting
 DEFAULT_FINGERPRINT_FILE = "dime_fingerprint.json"
+DEFAULT_MODEL_FINGERPRINT_FILE = "dime_model_fingerprint.json"
+DEFAULT_DATA_FINGERPRINT_FILE = "dime_data_fingerprint.json"
 DEFAULT_FINGERPRINT_PERSIST_PATH = os.path.join(DEFAULT_CACHE_PATH, DEFAULT_FINGERPRINT_FILE)
+DEFAULT_MODEL_FINGERPRINT_PERSIST_PATH = os.path.join(DEFAULT_CACHE_PATH, DEFAULT_MODEL_FINGERPRINT_FILE)
+DEFAULT_DATA_FINGERPRINT_PERSIST_PATH = os.path.join(DEFAULT_CACHE_PATH, DEFAULT_DATA_FINGERPRINT_FILE)
 
 # result persisting
 DEFAULT_PERSIST_PATH = "./dime_explanations"
@@ -65,7 +69,6 @@ RASA_CORE_URL = "http://localhost:5005"
 MODEL_REST_WEBHOOK_URL = "http://localhost:5005/webhooks/rest/webhook"
 RASA_REST_ENDPOINT_PARSE = "/model/parse"
 OUTPUT_MODE_DUAL = "dual"
-OUTPUT_MODE_LOCAL = "local"
 OUTPUT_MODE_GLOBAL = "global"
 DEFAULT_OUTPUT_MODE = OUTPUT_MODE_DUAL
 DEFAULT_RANKING_LENGTH = 10
@@ -90,20 +93,18 @@ DEFAULT_INIT_DEST_DIR_NAME = "./"
 RASA_DIRS_IN_DIME_INIT = ["data", "models"]
 
 # dime explanations
-DEFAULT_DIME_EXPLANATION_BASE_KEYS = ['global', 'local', 'dual', 'config', 'timestamp', 'data', 'model']
+DEFAULT_DIME_EXPLANATION_BASE_KEYS = ['global', 'dual', 'config', 'timestamp', 'data', 'model']
 DEFAULT_DIME_EXPLANATION_TIMESTAMP_KEYS = ['start', 'end']
 DEFAULT_DIME_EXPLANATION_MODEL_KEYS = ['fingerprint', 'name', 'version', 'type', 'path', 'mode', 'url']
 DEFAULT_DIME_EXPLANATION_DATA_KEYS = ['fingerprint', 'tokens', 'vocabulary', 'instances', 'intents', 'path']
-DEFAULT_DIME_EXPLANATION_CONFIG_KEYS = ['case_sensitive', 'output_mode', 'ranking_length', 'global_metric', 'ngrams']
+DEFAULT_DIME_EXPLANATION_CONFIG_KEYS = ['case_sensitive', 'output_mode', 'ranking_length', 'metric', 'ngrams']
 DEFAULT_DIME_EXPLANATION_NGRAMS_KEYS = ['min_ngrams', 'max_ngrams']
-DEFAULT_DIME_EXPLANATION_GLOBAL_KEYS = ['feature_importance', 'softmax_score']
-DEFAULT_DIME_EXPLANATION_LOCAL_KEYS = ['instance', 'local', 'global']
-DEFAULT_DIME_EXPLANATION_LOCAL_SUB_GLOBAL = ['feature_importance', 'feature_selection', 'softmax_score']
-DEFAULT_DIME_EXPLANATION_LOCAL_SUB_LOCAL = ['feature_importance', 'softmax_score']
-DEFAULT_DIME_EXPLANATION_DUAL_KEYS = ['instance', 'local', 'global', 'dual']
-DEFAULT_DIME_EXPLANATION_DUAL_SUB_GLOBAL = ['feature_importance', 'feature_selection', 'softmax_score']
-DEFAULT_DIME_EXPLANATION_DUAL_SUB_LOCAL = ['feature_importance', 'softmax_score']
-DEFAULT_DIME_EXPLANATION_DUAL_SUB_DUAL = ['feature_importance', 'softmax_score']
+DEFAULT_DIME_EXPLANATION_GLOBAL_KEYS = ['feature_importance', 'normalized_scores', 'probability_scores']
+DEFAULT_DIME_EXPLANATION_DUAL_KEYS = ['instance', 'global', 'dual']
+DEFAULT_DIME_EXPLANATION_DUAL_SUB_GLOBAL = ['feature_importance', 'feature_selection', 'normalized_scores',
+                                            'probability_scores', 'predicted_intent', 'predicted_confidence']
+DEFAULT_DIME_EXPLANATION_DUAL_SUB_DUAL = ['feature_importance', 'normalized_scores', 'probability_scores',
+                                          'test_norm_glob_prob', 'test_norm_dual_prob']
 DEFAULT_VISUALIZATIONS_LIMIT = 10
 
 
@@ -162,30 +163,6 @@ class TermColor:
     BWHITE = "\033[107m"
 
 
-# # Deprecated
-# class DIMEDebugMode:
-#     DEBUG_TRUE = "true"
-#     DEBUG_FALSE = "false"
-#     DEBUG_NONE = "none"
-#
-#     DEBUG_VALID_VALUES = [
-#         ["True", DEBUG_TRUE, "T", "t", "1"],
-#         ["False", DEBUG_FALSE, "F", "f", "0"],
-#     ]
-#
-#     @staticmethod
-#     def get_bool(debug_mode: str = None, ) -> Optional[bool]:
-#         if not debug_mode:
-#             return False
-#
-#         if debug_mode in DIMEDebugMode.DEBUG_VALID_VALUES[0]:
-#             return True
-#         elif debug_mode in DIMEDebugMode.DEBUG_VALID_VALUES[1]:
-#             return False
-#         else:
-#             return False
-
-
 class CLIOutput:
     GLOBAL = "global"
     LOCAL = "local"
@@ -212,14 +189,14 @@ class DIMEConfig:
     MAIN_KEY_CLI = 'dime_cli_configs'
 
     MAIN_CONFIG_KEYS = {'dime_base_configs': ['languages', 'data_path', 'models_path', 'model_type', 'model_mode',
-                                              'url_endpoint', 'data_instance', 'ranking_length', 'ngrams',
-                                              'case_sensitive', 'global_metric'],
+                                              'url_endpoint', 'data_instance', 'ranking_length',
+                                              'ngrams', 'case_sensitive', 'metric'],
                         'dime_server_configs': ['host', 'port', 'output_mode'],
                         'dime_cli_configs': ['output_mode']}
 
     ALL_KEYS = ['dime_base_configs', 'data_path', 'models_path', 'model_type', 'model_mode',
                 'url_endpoint', 'data_instance', 'ranking_length', 'ngrams', 'case_sensitive',
-                'global_metric', 'dime_server_configs', 'host', 'port', 'dime_cli_configs', 'output_mode']
+                'metric', 'dime_server_configs', 'host', 'port', 'dime_cli_configs', 'output_mode']
 
     BASE_CONFIG_PROPS = {'ngrams': ['max_ngrams', 'min_ngrams'],
                          'models_path': ['model_name'],
@@ -242,7 +219,7 @@ class DIMEConfig:
     SUB_KEY_BASE_NGRAMS_MAX = "max_ngrams"
     SUB_KEY_BASE_NGRAMS_MIN = "min_ngrams"
     SUB_KEY_BASE_CASE_SENSITIVITY = "case_sensitive"
-    SUB_KEY_BASE_GLOBAL_METRIC = "global_metric"
+    SUB_KEY_BASE_METRIC = "metric"
     SUB_KEY_SERVER_HOST = 'host'
     SUB_KEY_SERVER_PORT = 'port'
     SUB_KEY_CLI_OUTPUT_MODE = 'output_mode'
@@ -297,7 +274,6 @@ class Metrics:
     NORMALIZE = True
 
     # Confidence Configs
-    AVG_CONFIDENCE = 'avg'
     TOTAL_CONFIDENCE = 'sum'
 
 

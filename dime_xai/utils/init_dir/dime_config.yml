@@ -24,7 +24,7 @@ dime_base_configs:
     min_ngrams: 1
     max_ngrams: 2
   - case_sensitive: True
-  - global_metric: f1-score
+  - metric: confidence
 
 # Configurations that applies to DIME Server
 # If no config is provided following are the default configurations that DIME Server uses.

@@ -40,7 +40,7 @@ class DIMEExplainer:
             max_ngrams: int = DEFAULT_MAX_NGRAMS,
             min_ngrams: int = DEFAULT_MIN_NGRAMS,
             case_sensitive: bool = DEFAULT_CASE_SENSITIVE_MODE,
-            global_metric: Text = Metrics.F1_SCORE,
+            metric: Text = Metrics.F1_SCORE,
             testing_data_encoding: Text = FILE_ENCODING_UTF8,
             testing_data_read_mode: Text = FILE_READ_PERMISSION,
             file_extensions: Text = YAML_EXTENSIONS,
@@ -63,7 +63,7 @@ class DIMEExplainer:
         self.max_ngrams = max_ngrams
         self.min_ngrams = min_ngrams
         self.case_sensitive = case_sensitive
-        self.global_metric = global_metric
+        self.metric = metric
         self.testing_data_encoding = testing_data_encoding
         self.testing_data_read_mode = testing_data_read_mode
         self.nlu_tag = nlu_tag

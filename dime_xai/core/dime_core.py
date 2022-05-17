@@ -4,13 +4,16 @@ from typing import Optional, List, Dict, Text, Union
 import numpy as np
 from sklearn.metrics import f1_score, accuracy_score
 
-from dime_xai.shared.constants import Metrics, Smoothing, DEFAULT_RANKING_LENGTH
+from dime_xai.shared.constants import Metrics, Smoothing, DEFAULT_RANKING_LENGTH, NLU_FALLBACK_TAG
 from dime_xai.shared.explanation import DIMEExplanation
+from dime_xai.shared.exceptions.dime_core_exceptions import (
+    InvalidMetricSpecifiedException, InvalidIntentRankingException, InvalidNLUTagException, EmptyIntentRankingException,
+)
 
 logger = logging.getLogger(__name__)
 
 
-def get_f1_score(
+def get_global_f1_score(
         model_output: List,
         average: Text = Metrics.AVG_WEIGHTED
 ) -> float:
@@ -24,7 +27,7 @@ def get_f1_score(
     return score
 
 
-def get_accuracy_score(
+def get_global_accuracy_score(
         model_output: List,
         normalize: bool = Metrics.AVG_WEIGHTED
 ) -> float:
@@ -39,33 +42,41 @@ def get_accuracy_score(
 
 
 def get_confidence_score(
-        model_output: List,
-        confidence_op: Text = Metrics.TOTAL_CONFIDENCE
+        init_instance_output: Dict,
+        token_instance_output: Dict,
 ) -> float:
-    predicted_confidence = [output['intent_confidence'] for output in model_output]
-    if confidence_op == Metrics.TOTAL_CONFIDENCE:
-        total_predicted_confidence = sum(predicted_confidence)
-        score = total_predicted_confidence
-    elif confidence_op == Metrics.AVG_CONFIDENCE:
-        average_predicted_confidence = sum(predicted_confidence) / len(predicted_confidence)
-        score = average_predicted_confidence
+    predicted_class = init_instance_output['predicted_intent']
+    init_confidence = init_instance_output['predicted_confidence']
+
+    if token_instance_output['predicted_intent'] == predicted_class:
+        token_confidence = token_instance_output['predicted_confidence']
+    elif predicted_class == NLU_FALLBACK_TAG or \
+            token_instance_output['predicted_intent'] == NLU_FALLBACK_TAG:
+        token_confidence = 0.0
     else:
-        score = 0.0
-    return score
+        try:
+            token_confidence = [i['confidence'] for i
+                                in token_instance_output['intent_ranking']
+                                if i['name'] == predicted_class][0]
+        except IndexError:
+            raise InvalidIntentRankingException(f"The predicted intent is not "
+                                                f"available in the intent ranking list")
+
+    token_confidence_diff = init_confidence - token_confidence
+    return token_confidence_diff
 
 
-def get_score(
+def get_global_score(
         token: Text,
         init_model_output: List,
         token_model_output: List,
         scorer: Text = Metrics.DEFAULT,
         average: Text = Metrics.AVG_WEIGHTED,
         normalize: bool = Metrics.NORMALIZE,
-        confidence_op: Text = Metrics.TOTAL_CONFIDENCE,
 ) -> Optional[float]:
     if scorer == Metrics.F1_SCORE:
-        init_f1_score = get_f1_score(model_output=init_model_output, average=average)
-        token_f1_score = get_f1_score(model_output=token_model_output, average=average)
+        init_f1_score = get_global_f1_score(model_output=init_model_output, average=average)
+        token_f1_score = get_global_f1_score(model_output=token_model_output, average=average)
 
         if init_f1_score < token_f1_score:
             logger.warning(f"F1-Score has boosted for the token '{token}")
@@ -73,8 +84,8 @@ def get_score(
         return token_f1_score_diff
 
     elif scorer == Metrics.ACCURACY:
-        init_accuracy = get_accuracy_score(model_output=init_model_output, normalize=normalize)
-        token_accuracy = get_accuracy_score(model_output=token_model_output, normalize=normalize)
+        init_accuracy = get_global_accuracy_score(model_output=init_model_output, normalize=normalize)
+        token_accuracy = get_global_accuracy_score(model_output=token_model_output, normalize=normalize)
 
         if init_accuracy < token_accuracy:
             logger.info(f"Accuracy has boosted for the token '{token}")
@@ -82,16 +93,66 @@ def get_score(
         return token_accuracy_diff
 
     elif scorer == Metrics.CONFIDENCE:
-        init_confidence = get_confidence_score(model_output=init_model_output, confidence_op=confidence_op)
-        token_confidence = get_confidence_score(model_output=token_model_output, confidence_op=confidence_op)
+        token_confidence_diff = 0
+        for init_instance in init_model_output:
+            tag = init_instance['tag']
+            token_instance = [x for x in token_model_output if x['tag'] == tag][0]
 
-        if init_confidence < token_confidence:
-            if confidence_op == Metrics.TOTAL_CONFIDENCE:
-                logger.info(f"Total confidence has boosted for the token '{token}")
-            if confidence_op == Metrics.AVG_CONFIDENCE:
-                logger.info(f"Average confidence has boosted for the token '{token}")
-        token_confidence_diff = init_confidence - token_confidence
+            if not token_instance:
+                raise InvalidNLUTagException(f"There is a mismatch between NLU tags")
+
+            if 'intent_ranking' not in init_instance or \
+                    'intent_ranking' not in token_instance:
+                raise EmptyIntentRankingException(f"Failed to retrieve the intent ranking")
+
+            instance_confidence_score = get_confidence_score(
+                init_instance_output=init_instance,
+                token_instance_output=token_instance,
+            )
+            token_confidence_diff += instance_confidence_score
         return token_confidence_diff
+    else:
+        raise InvalidMetricSpecifiedException(f"The metric must be Accuracy, F1-Score, "
+                                              f"or Confidence for Global feature importance")
+
+
+def global_feature_importance(
+        init_model_output: List,
+        token_model_output: List,
+        token: Text,
+        scorer: Text = Metrics.CONFIDENCE,
+        average: Text = Metrics.AVG_WEIGHTED,
+        normalize: bool = Metrics.NORMALIZE,
+) -> Optional[Dict]:
+    score = get_global_score(
+        init_model_output=init_model_output,
+        token_model_output=token_model_output,
+        scorer=scorer,
+        average=average,
+        normalize=normalize,
+        token=token,
+    )
+    return score
+
+
+def dual_feature_importance(
+        init_instance_output: Dict,
+        token_instance_output: Dict,
+        scorer: Text = Metrics.CONFIDENCE,
+) -> Optional[float]:
+    if scorer in [Metrics.CONFIDENCE]:
+        if 'intent_ranking' not in init_instance_output or \
+                'intent_ranking' not in token_instance_output:
+            raise EmptyIntentRankingException(f"Failed to retrieve the intent ranking")
+
+        score = get_confidence_score(
+            init_instance_output=init_instance_output,
+            token_instance_output=token_instance_output,
+        )
+        return score
+    else:
+        raise InvalidMetricSpecifiedException(f"The metric must be Model Confidence"
+                                              f" for Dual feature importance")
 
 
 def softmax(
@@ -140,45 +201,25 @@ def min_max_normalize(
         return (vector_np - min_value) / (max_value - min_value)
 
 
-def global_feature_importance(
-        init_model_output: List,
-        token_model_output: List,
-        token: Text,
-        scorer: Text = Metrics.F1_SCORE,
-        average: Text = Metrics.AVG_WEIGHTED,
-        normalize: bool = Metrics.NORMALIZE,
-        confidence_op: Text = Metrics.TOTAL_CONFIDENCE,
-) -> Optional[Dict]:
-    score = get_score(
-        init_model_output=init_model_output,
-        token_model_output=token_model_output,
-        scorer=scorer,
-        average=average,
-        normalize=normalize,
-        confidence_op=confidence_op,
-        token=token
-    )
-    return score
-
-
-def local_feature_importance(
-        selected_tokens: List,
-) -> Optional[Dict]:
-    # TODO :implement local
-    return {'sample1': 2.5, 'sample2': 2}
-
-
-def dual_feature_importance(
-        global_selection: Dict,
-        local_scores: Dict,
-) -> Optional[Dict]:
-    # TODO :implement dual
-    return {'sample1': 2.5, 'sample2': 2}
+def to_probability_series(
+        series: Union[List, Dict]
+) -> Union[np.array, Dict]:
+    if isinstance(series, Dict):
+        keys = list(series.keys())
+        values = list(series.values())
+        probabilities = to_probability_series(series=values)
+        return {keys[x]: probabilities[x] for x in range(len(keys))}
+    else:
+        series_copy = series.copy()
+        series_np = np.array(series_copy)
+        series_max = max(series_np)
+        series_np = np.clip(series_np, a_min=0, a_max=series_max)
+        return series_np / series_np.sum()
 
 
 def feature_selection(
         global_scores: Dict,
-        ranking_length: int = DEFAULT_RANKING_LENGTH
+        ranking_length: int = DEFAULT_RANKING_LENGTH,
 ) -> Optional[Dict]:
     ranked_tokens = {
         t: s for t, s in sorted(

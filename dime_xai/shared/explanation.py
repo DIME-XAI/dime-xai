@@ -16,14 +16,9 @@ from dime_xai.shared.constants import (
     DEFAULT_DIME_EXPLANATION_CONFIG_KEYS,
     DEFAULT_DIME_EXPLANATION_NGRAMS_KEYS,
     OUTPUT_MODE_GLOBAL,
-    OUTPUT_MODE_LOCAL,
     OUTPUT_MODE_DUAL,
     DEFAULT_DIME_EXPLANATION_GLOBAL_KEYS,
-    DEFAULT_DIME_EXPLANATION_LOCAL_KEYS,
-    DEFAULT_DIME_EXPLANATION_LOCAL_SUB_GLOBAL,
-    DEFAULT_DIME_EXPLANATION_LOCAL_SUB_LOCAL,
     DEFAULT_DIME_EXPLANATION_DUAL_SUB_GLOBAL,
-    DEFAULT_DIME_EXPLANATION_DUAL_SUB_LOCAL,
     DEFAULT_DIME_EXPLANATION_DUAL_SUB_DUAL,
     DEFAULT_DIME_EXPLANATION_DUAL_KEYS,
 )
@@ -157,25 +152,6 @@ class DIMEExplanation:
                     logger.error(f"Invalid key '{key}' found under DIME explanation's 'output_mode' key")
                     return False
 
-        if self.explanation['config']['output_mode'] == OUTPUT_MODE_LOCAL:
-            for instance in self.explanation['local']:
-                for key in instance:
-                    if key not in DEFAULT_DIME_EXPLANATION_LOCAL_KEYS:
-                        logger.error(f"Invalid key '{key}' found under DIME explanation's 'local' key")
-                        return False
-                    if key == instance[key]:
-                        for subkey in key:
-                            if subkey not in DEFAULT_DIME_EXPLANATION_LOCAL_SUB_GLOBAL:
-                                logger.error(f"Invalid key '{subkey}' found under DIME "
-                                             f"explanation's 'local > global' key")
-                                return False
-                    if key == 'local':
-                        for subkey in instance[key]:
-                            if subkey not in DEFAULT_DIME_EXPLANATION_LOCAL_SUB_LOCAL:
-                                logger.error(f"Invalid key '{subkey}' found under DIME "
-                                             f"explanation's 'local > local' key")
-                                return False
-
         if self.explanation['config']['output_mode'] == OUTPUT_MODE_DUAL:
             for instance in self.explanation['dual']:
                 for key in instance:
@@ -187,12 +163,6 @@ class DIMEExplanation:
                             if subkey not in DEFAULT_DIME_EXPLANATION_DUAL_SUB_GLOBAL:
                                 logger.error(f"Invalid key '{subkey}' found under DIME "
                                              f"explanation's 'dual > global' key")
-                                return False
-                    if key == 'local':
-                        for subkey in instance[key]:
-                            if subkey not in DEFAULT_DIME_EXPLANATION_DUAL_SUB_LOCAL:
-                                logger.error(f"Invalid key '{subkey}' found under DIME "
-                                             f"explanation's 'dual > local' key")
                                 return False
                     if key == 'dual':
                         for subkey in instance[key]:
@@ -248,70 +218,59 @@ class DIMEExplanation:
                 logger.warning(f"Token limit will be ignored and all tokens "
                                f"will be visualized")
 
-            max_token_limit = len(self.explanation['global']['normalized'].keys())
+            max_token_limit = len(self.explanation['global']['normalized_scores'].keys())
             if token_limit > max_token_limit or token_limit == 0:
                 token_limit = max_token_limit
 
             global_title = f"GLOBAL FEATURE IMPORTANCE SCORES"
             global_description = f"{main_description}"
-            global_labels = list(self.explanation['global']['normalized'].keys())[0:token_limit]
-            global_data = [[score] for score
-                           in list(self.explanation['global']['normalized'].values())[0:token_limit]]
+            global_proba_labels = list(self.explanation['global']['probability_scores'].keys())[0:token_limit]
+            global_proba_data = [[score] for score
+                                 in list(self.explanation['global']['probability_scores'].values())[0:token_limit]]
         else:
             global_title = f"{title} FEATURE IMPORTANCE SCORES\nDATA INSTANCE: {instance['instance']}"
+            global_title += f"\nPREDICTED INTENT: {instance['global']['predicted_intent']}"
+            global_title += f"\nCONFIDENCE: {instance['global']['predicted_confidence']}"
             gfi = [f'{t}={s}' for t, s in instance['global']['feature_importance'].items()]
             gfs = [f'{t}' for t in instance['global']['feature_selection'].keys()]
-            gfw = [f'{t}={s}' for t, s in instance['global']['normalized'].items()]
+            gfw = [f'{t}={s}' for t, s in instance['global']['normalized_scores'].items()]
+            gfp = [f'{t}={s}' for t, s in instance['global']['probability_scores'].items()]
             global_description = f"{main_description}" \
                                  f"Ranking Length: {self.explanation['config']['ranking_length']}\n\n" \
                                  f"Global feature importance scores (Raw): \t" \
                                  f"{', '.join(gfi)}\n" \
                                  f"Selected token list based on global score: \t" \
                                  f"{', '.join(gfs)}\n" \
-                                 f"Global feature importance scores (Softmax): \t" \
-                                 f"{', '.join(gfw)}\n"
+                                 f"Global feature importance scores (Normalized): \t" \
+                                 f"{', '.join(gfw)}\n" \
+                                 f"Global feature importance probability scores: \t" \
+                                 f"{', '.join(gfp)}\n"
 
-            global_labels = list(instance['global']['normalized'].keys())
-            global_data = [[score] for score
-                           in list(instance['global']['normalized'].values())]
+            global_proba_labels = list(instance['global']['probability_scores'].keys())
+            global_proba_data = [[score] for score
+                                 in list(instance['global']['probability_scores'].values())]
 
         DIMEExplanation._visualize_cli_chart(
             title=global_title,
             description=global_description,
-            labels=global_labels,
-            data=global_data,
-        )
-
-    @staticmethod
-    def _visualize_local(instance: Dict) -> NoReturn:
-        lfi = [f'{t}={s}' for t, s in instance['local']['feature_importance'].items()]
-        lfw = [f'{t}={s}' for t, s in instance['local']['normalized'].items()]
-        local_description = f"\n\n\nLocal feature importance scores (Raw):   \t" \
-                            f"{', '.join(lfi)}\n" \
-                            f"Local feature importance scores (Softmax): \t" \
-                            f"{', '.join(lfw)}\n"
-
-        local_labels = list(instance['local']['normalized'].keys())
-        local_data = [[score] for score
-                      in list(instance['local']['normalized'].values())]
-        DIMEExplanation._visualize_cli_chart(
-            title="",
-            description=local_description,
-            labels=local_labels,
-            data=local_data,
+            labels=global_proba_labels,
+            data=global_proba_data,
         )
 
     @staticmethod
     def _visualize_dual(instance: Dict) -> NoReturn:
         dfi = [f'{t}={s}' for t, s in instance['dual']['feature_importance'].items()]
-        dfw = [f'{t}={s}' for t, s in instance['dual']['normalized'].items()]
+        dfw = [f'{t}={s}' for t, s in instance['dual']['normalized_scores'].items()]
+        dfp = [f'{t}={s}' for t, s in instance['dual']['probability_scores'].items()]
         dual_description = f"\n\n\nDual feature importance scores (Raw):   \t" \
                            f"{', '.join(dfi)}\n" \
-                           f"Dual feature importance scores (Softmax): \t" \
-                           f"{', '.join(dfw)}\n"
+                           f"Dual feature importance scores (Normalized): \t" \
+                           f"{', '.join(dfw)}\n" \
+                           f"Dual feature importance probability scores: \t" \
+                           f"{', '.join(dfp)}\n"
 
-        dual_labels = list(instance['dual']['normalized'].keys())
-        dual_data = [[score] for score in list(instance['dual']['normalized'].values())]
+        dual_labels = list(instance['dual']['probability_scores'].keys())
+        dual_data = [[score] for score in list(instance['dual']['probability_scores'].values())]
         DIMEExplanation._visualize_cli_chart(
             title="",
             description=dual_description,
@@ -324,7 +283,7 @@ class DIMEExplanation:
 
         main_description = f"Explanation Type: {self.explanation['config']['output_mode']}\n" \
                            f"Case Sensitive: {self.explanation['config']['case_sensitive']}\n" \
-                           f"Global Metric: {self.explanation['config']['global_metric']}\n" \
+                           f"Global Metric: {self.explanation['config']['metric']}\n" \
                            f"N-grams: {self.explanation['config']['ngrams']}\n"
 
         if output_mode == OUTPUT_MODE_GLOBAL:
@@ -336,24 +295,14 @@ class DIMEExplanation:
                 token_limit=token_limit
             )
 
-        elif output_mode == OUTPUT_MODE_LOCAL:
-            if token_limit:
-                logger.warning(f"Token limit specified will be ignored "
-                               f"while visualizing Local and DIME explanations")
-
-            for instance in self.explanation['local']:
-                self._visualize_global(title='LOCAL', main_description=main_description, instance=instance)
-                # self._visualize_local(instance=instance)
-
         elif output_mode == OUTPUT_MODE_DUAL:
             if token_limit:
                 logger.warning(f"Token limit specified will be ignored "
-                               f"while visualizing Local and DIME explanations")
+                               f"while visualizing Dual explanations")
 
             for instance in self.explanation['dual']:
                 self._visualize_global(title='DUAL', main_description=main_description, instance=instance)
-                # self._visualize_local(instance=instance)
-                # self._visualize_dual(instance=instance)
+                self._visualize_dual(instance=instance)
 
         else:
             logger.error(f"The output_mode specified for the explanation "

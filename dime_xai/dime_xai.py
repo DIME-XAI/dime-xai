@@ -12,7 +12,6 @@ from dime_xai.shared.constants import (
     DEFAULT_PERSIST_PATH,
     OUTPUT_MODE_GLOBAL,
     OUTPUT_MODE_DUAL,
-    OUTPUT_MODE_LOCAL,
     PACKAGE_VERSION_LONG,
     Metrics,
 )
@@ -102,13 +101,13 @@ def create_argument_parser():
         type=str,
         choices=[Metrics.F1_SCORE, Metrics.ACCURACY, Metrics.CONFIDENCE],
         default=None,
-        help="metric used to calculate the global feature importance.",
+        help="metric used to calculate the feature importance.",
     )
     parser_explainer.add_argument(
         "-o",
         "--output",
         type=str,
-        choices=[OUTPUT_MODE_GLOBAL, OUTPUT_MODE_DUAL, OUTPUT_MODE_LOCAL],
+        choices=[OUTPUT_MODE_GLOBAL, OUTPUT_MODE_DUAL],
         help="data instance to generate explanations.",
     )
     parser_explainer.add_argument(
@@ -210,15 +209,14 @@ def run_dime_cli() -> Optional:
                     dest_dir = "."
 
                 if dest_dir and not dir_exists(dir_path=dest_dir):
-                    logger.error("Directory name should only contain "
-                                 "valid chars and it should not be a path.")
+                    logger.error("Directory name or path should be a "
+                                 "valid existing directory")
                     return
 
                 dime_init = DIMEInit()
                 dime_init.build_scaffold(dest_path=dest_dir)
             except KeyboardInterrupt:
-                print("")
-                logger.error("Non-graceful termination occurred. [Ctrl+C]")
+                logger.error("Gracefully terminating DIME init...")
 
         elif str(interface).lower() == InterfaceType.INTERFACE_SERVER:
             server_port = cmdline_args.port
@@ -245,7 +243,7 @@ def run_dime_cli() -> Optional:
         elif str(interface).lower() == InterfaceType.INTERFACE_CLI_EXPLAINER:
             data_instance = cmdline_args.instance
             output_mode = cmdline_args.output
-            global_metric = cmdline_args.metric
+            metric = cmdline_args.metric
             case_sensitive = cmdline_args.case
             debug_mode = cmdline_args.debug
 
@@ -256,7 +254,7 @@ def run_dime_cli() -> Optional:
                 interface=InterfaceType.INTERFACE_CLI,
                 data_instance=data_instance,
                 output_mode=output_mode,
-                global_metric=global_metric,
+                metric=metric,
                 case_sensitive=case_sensitive,
             )
             if not configs:

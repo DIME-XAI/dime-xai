@@ -5,6 +5,10 @@ class InvalidDIMEExplanationFilePath(DIMEBaseException):
     pass
 
 
+class NotImplementedException(DIMEBaseException):
+    pass
+
+
 class DIMEExplanationFileLoadException(DIMEBaseException):
     pass
 
@@ -26,4 +30,40 @@ class InvalidDIMEExplanationStructure(DIMEBaseException):
 
 
 class RESTModelLoadException(DIMEBaseException):
+    pass
+
+
+class ModelFingerprintPersistException(DIMEBaseException):
+    pass
+
+
+class DataFingerprintPersistException(DIMEBaseException):
+    pass
+
+
+class DIMEFingerprintPersistException(DIMEBaseException):
+    pass
+
+
+class InvalidIntentSpecifiedException(DIMEBaseException):
+    pass
+
+
+class InvalidMetricSpecifiedException(DIMEBaseException):
+    pass
+
+
+class InvalidIntentRankingException(DIMEBaseException):
+    pass
+
+
+class NLUDataTaggingException(DIMEBaseException):
+    pass
+
+
+class InvalidNLUTagException(DIMEBaseException):
+    pass
+
+
+class EmptyIntentRankingException(DIMEBaseException):
     pass

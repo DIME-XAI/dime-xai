@@ -11,7 +11,9 @@ from dime_xai.shared.constants import (
     MODEL_MODE_REST,
     OUTPUT_MODE_GLOBAL,
 )
-from dime_xai.shared.exceptions.dime_base_exception import DIMEBaseException
+from dime_xai.shared.exceptions.dime_base_exception import (
+    DIMEBaseException,
+)
 from dime_xai.shared.exceptions.dime_core_exceptions import (
     InvalidDIMEExplanationFilePath,
     DIMEExplanationFileLoadException,
@@ -19,8 +21,17 @@ from dime_xai.shared.exceptions.dime_core_exceptions import (
     DIMEExplanationFileExistsException,
     InvalidDIMEExplanationStructure,
     RESTModelLoadException,
+    ModelFingerprintPersistException,
+    DataFingerprintPersistException,
+    DIMEFingerprintPersistException,
+    InvalidMetricSpecifiedException,
+    InvalidIntentRankingException,
+    NLUDataTaggingException,
+    EmptyIntentRankingException,
 )
-from dime_xai.shared.exceptions.dime_io_exceptions import EmptyNLUDatasetException
+from dime_xai.shared.exceptions.dime_io_exceptions import (
+    EmptyNLUDatasetException,
+)
 from dime_xai.utils.io import exit_dime
 
 logger = logging.getLogger(__name__)
@@ -48,7 +59,9 @@ class DimeCLIExplainer:
 
             if output_mode == OUTPUT_MODE_GLOBAL:
                 logger.error(f"Global feature importance cannot be calculated on REST "
-                             f"models. Please try loading a local model instead.")
+                             f"models while using DIME CLI/SERVER. Please try loading "
+                             f"a local model instead. Try jupyter notebooks using DIME "
+                             f"API to get global feature importance from a REST model")
                 exit_dime(1)
 
         try:
@@ -66,10 +79,10 @@ class DimeCLIExplainer:
                     min_ngrams=self.configs[DIMEConfig.MAIN_KEY_BASE][DIMEConfig.SUB_KEY_BASE_NGRAMS_MIN],
                     max_ngrams=self.configs[DIMEConfig.MAIN_KEY_BASE][DIMEConfig.SUB_KEY_BASE_NGRAMS_MAX],
                     case_sensitive=self.configs[DIMEConfig.MAIN_KEY_BASE][DIMEConfig.SUB_KEY_BASE_CASE_SENSITIVITY],
-                    global_metric=self.configs[DIMEConfig.MAIN_KEY_BASE][DIMEConfig.SUB_KEY_BASE_GLOBAL_METRIC],
+                    metric=self.configs[DIMEConfig.MAIN_KEY_BASE][DIMEConfig.SUB_KEY_BASE_METRIC],
                     output_mode=self.configs[DIMEConfig.MAIN_KEY_CLI][DIMEConfig.SUB_KEY_CLI_OUTPUT_MODE],
                 )
-                explanation = rasa_dime_explainer.explain()
+                explanation = rasa_dime_explainer.explain(inspect=True)
                 explanation.visualize()
             elif model_type == MODEL_TYPE_OTHER:
                 custom_dime_explainer = CustomDIMEExplainer(
@@ -84,13 +97,31 @@ class DimeCLIExplainer:
                     min_ngrams=self.configs[DIMEConfig.MAIN_KEY_BASE][DIMEConfig.SUB_KEY_BASE_NGRAMS_MIN],
                     max_ngrams=self.configs[DIMEConfig.MAIN_KEY_BASE][DIMEConfig.SUB_KEY_BASE_NGRAMS_MAX],
                     case_sensitive=self.configs[DIMEConfig.MAIN_KEY_BASE][DIMEConfig.SUB_KEY_BASE_CASE_SENSITIVITY],
-                    global_metric=self.configs[DIMEConfig.MAIN_KEY_BASE][DIMEConfig.SUB_KEY_BASE_GLOBAL_METRIC],
+                    metric=self.configs[DIMEConfig.MAIN_KEY_BASE][DIMEConfig.SUB_KEY_BASE_METRIC],
                     output_mode=self.configs[DIMEConfig.MAIN_KEY_CLI][DIMEConfig.SUB_KEY_CLI_OUTPUT_MODE],
                 )
                 explanation = custom_dime_explainer.explain()
                 explanation.visualize()
+        # Training data exceptions
         except EmptyNLUDatasetException as e:
-            logger.error(f"Got an empty dataset. Possibly a YAML format issue. {e}")
+            logger.error(e)
+        except NLUDataTaggingException as e:
+            logger.error(e)
+        # Fingerprinting exceptions
+        except ModelFingerprintPersistException as e:
+            logger.error(e)
+        except DataFingerprintPersistException as e:
+            logger.error(e)
+        except DIMEFingerprintPersistException as e:
+            logger.error(e)
+        # DIME Core exceptions
+        except EmptyIntentRankingException as e:
+            logger.error(e)
+        except InvalidMetricSpecifiedException as e:
+            logger.error(e)
+        except InvalidIntentRankingException as e:
+            logger.error(e)
+        # DIME Explanation exceptions
         except InvalidDIMEExplanationFilePath as e:
             logger.error(e)
         except DIMEExplanationFileLoadException as e:
@@ -101,10 +132,13 @@ class DimeCLIExplainer:
             logger.error(e)
         except InvalidDIMEExplanationStructure as e:
             logger.error(e)
+        # Model exceptions
         except RESTModelLoadException as e:
             logger.error(e)
+        # DIME Base exceptions
         except DIMEBaseException as e:
             logger.error(f"Unknown Base Exception {e}")
+        # Default exceptions
         except KeyboardInterrupt:
             logger.info(f"Gracefully terminating DIME CLI Explainer...")
             exit_dime(1)
@@ -114,8 +148,8 @@ class DimeCLIExplainer:
         except OSError as e:
             logger.info(f"OSError exception occurred while loading the model. {e}")
             exit_dime(1)
-        except Exception as e:
-            logger.error(f"Unknown CLI Exception {e}")
+        # except Exception as e:
+        #     logger.error(f"Unknown CLI Exception. {e}")
 
 
 class DimeCLIVisualizer:
@@ -133,7 +167,7 @@ class DimeCLIVisualizer:
         try:
             explanation = load_explanation(explanation=self.file_name)
             explanation.visualize(token_limit=self.limit)
-
+        # DIME explanation exceptions
         except InvalidDIMEExplanationFilePath as e:
             logger.error(e)
         except DIMEExplanationFileLoadException as e:
@@ -142,8 +176,10 @@ class DimeCLIVisualizer:
             logger.error(e)
         except InvalidDIMEExplanationStructure as e:
             logger.error(e)
+        # DIME Base exceptions
         except DIMEBaseException as e:
             logger.error(f"Unknown Base Exception {e}")
+        # Default exceptions
         except KeyboardInterrupt:
             logger.info(f"Gracefully terminating DIME CLI Visualizer...")
             exit_dime(1)

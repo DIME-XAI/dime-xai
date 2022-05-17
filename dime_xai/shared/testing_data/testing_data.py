@@ -17,10 +17,15 @@ class TestingData:
     ):
         self._testing_data_dir = testing_data_dir
         self._testing_data = None
+        self._tagged_testing_data = None
         self._tokens = list()
         self._vocabulary = list()
         self._fingerprint = None
         self.case_sensitive = case_sensitive
+
+    @staticmethod
+    def _tag_examples(testing_data: List) -> List:
+        pass
 
     def _initialize_testing_data(self) -> NoReturn:
         pass
@@ -34,5 +39,5 @@ class TestingData:
     def get_intents(self) -> Optional[List]:
         pass
 
-    def get_intent_size(self,) -> Optional[int]:
+    def get_intent_size(self, ) -> Optional[int]:
         pass

@@ -13,7 +13,6 @@ from dime_xai.shared.constants import (
     MODEL_MODE_LOCAL,
     DEFAULT_RANKING_LENGTH,
     DEFAULT_MAX_NGRAMS,
-    OUTPUT_MODE_LOCAL,
     OUTPUT_MODE_DUAL,
     OUTPUT_MODE_GLOBAL,
     LANGUAGES_SUPPORTED,
@@ -56,7 +55,7 @@ def get_default_configs(
         server_port: Text = None,
         data_instance: Text = None,
         output_mode: Text = None,
-        global_metric: Text = None,
+        metric: Text = None,
         case_sensitive: Text = None,
 ) -> Optional[Dict]:
     try:
@@ -150,10 +149,10 @@ def get_default_configs(
                                    f"while running the DIME CLI")
                     key_content_dict[DIMEConfig.SUB_KEY_BASE_DATA_INSTANCE] = [data_instance]
 
-                if global_metric:
-                    logger.warning("The global metric specified in the config file "
-                                   f"will be discarded and set to '{global_metric}'")
-                    key_content_dict[DIMEConfig.SUB_KEY_BASE_GLOBAL_METRIC] = global_metric
+                if metric:
+                    logger.warning("The metric specified in the config file "
+                                   f"will be discarded and set to '{metric}'")
+                    key_content_dict[DIMEConfig.SUB_KEY_BASE_METRIC] = metric
 
                 if case_sensitive in [True, False]:
                     logger.warning("The case sensitivity specified in the config file "
@@ -311,9 +310,9 @@ def get_default_configs(
                     raise InvalidDataTypeException(f"'{DIMEConfig.SUB_KEY_BASE_CASE_SENSITIVITY}' must be either True "
                                                    f"or False")
 
-                if str.lower(key_content_dict[DIMEConfig.SUB_KEY_BASE_GLOBAL_METRIC]) not in \
+                if str.lower(key_content_dict[DIMEConfig.SUB_KEY_BASE_METRIC]) not in \
                         [Metrics.F1_SCORE, Metrics.ACCURACY, Metrics.CONFIDENCE]:
-                    raise InvalidConfigValueException(f"'{DIMEConfig.SUB_KEY_BASE_GLOBAL_METRIC}' must be either "
+                    raise InvalidConfigValueException(f"'{DIMEConfig.SUB_KEY_BASE_METRIC}' must be either "
                                                       f"'{Metrics.F1_SCORE}', '{Metrics.CONFIDENCE}' or "
                                                       f"'{Metrics.ACCURACY}'")
 
@@ -345,9 +344,9 @@ def get_default_configs(
                         raise InvalidConfigValueException(f"'{s}' of '{key}' cannot be empty")
 
                 if key_content_dict[DIMEConfig.SUB_KEY_CLI_OUTPUT_MODE] not in \
-                        [OUTPUT_MODE_LOCAL, OUTPUT_MODE_GLOBAL, OUTPUT_MODE_DUAL]:
+                        [OUTPUT_MODE_GLOBAL, OUTPUT_MODE_DUAL]:
                     raise InvalidConfigValueException(f"'{DIMEConfig.SUB_KEY_CLI_OUTPUT_MODE}' must be "
-                                                      f"'{OUTPUT_MODE_DUAL}', '{OUTPUT_MODE_LOCAL}', or "
+                                                      f"'{OUTPUT_MODE_DUAL}' or "
                                                       f"'{OUTPUT_MODE_GLOBAL}")
 
                 if key_content_dict[DIMEConfig.SUB_KEY_CLI_OUTPUT_MODE] == OUTPUT_MODE_GLOBAL:

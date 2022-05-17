@@ -84,12 +84,39 @@ def remove_token(instance: Text, token: Text) -> Text:
     return regex.sub(token, "", instance)
 
 
-def remove_token_from_dataset(testing_data: Dict, token: Text) -> Dict:
+def remove_token_from_dataset(testing_data: Union[List, Dict], token: Text) -> Union[List, Dict]:
     testing_data_copy = testing_data.copy()
-    for intent, examples in testing_data_copy.items():
-        testing_data_copy[intent] = [remove_token(example, token) for example in examples]
-    return testing_data_copy
+
+    if isinstance(testing_data_copy, Dict):
+        for intent, examples in testing_data_copy.items():
+            testing_data_copy[intent] = [remove_token(example, token) for example in examples]
+        return testing_data_copy
+    else:
+        for instance in testing_data_copy:
+            instance['example'] = remove_token(instance=instance['example'], token=token)
+        return testing_data_copy
 
 
 def lowercase_list(instances_list: List) -> List:
     return [str.lower(instance) for instance in instances_list]
+
+
+def order_dict(
+        dict_to_order: Dict,
+        order_by_key: bool = False,
+        reverse: bool = False,
+) -> Optional[Dict]:
+    if not dict_to_order:
+        return None
+
+    if order_by_key:
+        index = 0
+    else:
+        index = 1
+
+    return {
+        k: v for k, v in sorted(
+            dict_to_order.items(),
+            key=lambda x: x[index],
+            reverse=reverse)
+    }

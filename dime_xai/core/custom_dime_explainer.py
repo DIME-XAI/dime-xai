@@ -1,5 +1,5 @@
 import logging
-from typing import Text, Dict, Optional, List
+from typing import Text, Optional, List
 
 from dime_xai.core.dime_explainer import DIMEExplainer
 from dime_xai.shared.constants import (
@@ -45,7 +45,7 @@ class CustomDIMEExplainer(DIMEExplainer):
             max_ngrams: int = DEFAULT_MAX_NGRAMS,
             min_ngrams: int = DEFAULT_MIN_NGRAMS,
             case_sensitive: bool = DEFAULT_CASE_SENSITIVE_MODE,
-            global_metric: Text = Metrics.F1_SCORE,
+            metric: Text = Metrics.F1_SCORE,
             testing_data_encoding: Text = FILE_ENCODING_UTF8,
             testing_data_read_mode: Text = FILE_READ_PERMISSION,
             file_extensions: Text = YAML_EXTENSIONS,
@@ -67,7 +67,7 @@ class CustomDIMEExplainer(DIMEExplainer):
             max_ngrams=max_ngrams,
             min_ngrams=min_ngrams,
             case_sensitive=case_sensitive,
-            global_metric=global_metric,
+            metric=metric,
             testing_data_encoding=testing_data_encoding,
             testing_data_read_mode=testing_data_read_mode,
             file_extensions=file_extensions,
