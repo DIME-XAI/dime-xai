@@ -277,6 +277,14 @@ class RasaDIMEExplainer(DIMEExplainer):
             global_scores=global_scores,
             ranking_length=self.ranking_length
         )
+
+        if not global_selection:
+            logger.warning("All features have a global feature "
+                           "importance score of 0. DIME will not "
+                           "be able to proceed with dual feature "
+                           "importance calculation.")
+            exit_dime(1)
+
         global_normalized_scores = min_max_normalize(vector=global_selection)
         global_probabilities = to_probability_series(series=global_selection)
 
@@ -355,10 +363,6 @@ class RasaDIMEExplainer(DIMEExplainer):
                 instance_scores['dual']['feature_importance'] = dual_output['dual_scores']
                 instance_scores['dual']['normalized_scores'] = dual_output['dual_normalized_scores']
                 instance_scores['dual']['probability_scores'] = dual_output['dual_probabilities']
-                instance_scores['dual']['test_norm_dual_prob'] = \
-                    to_probability_series(series=dual_output['dual_normalized_scores'])
-                instance_scores['dual']['test_norm_glob_prob'] = \
-                    to_probability_series(series=dual_output['global_normalized_scores'])
 
                 all_dime_scores.append(instance_scores)
             explanation['dual'] = all_dime_scores

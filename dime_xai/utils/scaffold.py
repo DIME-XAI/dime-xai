@@ -25,6 +25,10 @@ logger = logging.getLogger(__name__)
 
 
 class DIMEInit:
+    """
+    Contains paths where starter DIME projects
+    should be created and required methods
+    """
     def __init__(self, src: Text = DEFAULT_INIT_SRC_DIR_NAME):
         self._src = src
         self.src_path = None
@@ -35,6 +39,20 @@ class DIMEInit:
             self,
             dest_path: Text = DEFAULT_INIT_DEST_DIR_NAME
     ) -> NoReturn:
+        """
+        Creates the initial DIME Project structure
+        in a given destination directory path. Creates all
+        required files in order to run DIME CLI. [Does not
+        support online Notebook environments yet]
+
+        Args:
+            dest_path: destination directory path where the
+                scaffold should be created
+
+        Returns:
+            no return
+        """
+
         dest_path = str(dest_path).strip()
         if not dest_path or str(dest_path).strip() in ALLOWED_INIT_DIR_NAMES:
             dest_path = DEFAULT_INIT_DEST_DIR_NAME
@@ -87,6 +105,21 @@ class DIMEInit:
             exit_dime()
 
     def _verify_destination_dir(self, dest_path: Text = None) -> Text:
+        """
+        validates if a given directory path
+        is a valid directory path where a DIME
+        project can be initialized
+
+        Args:
+            dest_path: destination directory path where the
+                scaffold should be created
+
+        Returns:
+            returns "invalid", "valid", "dime", "rasa", "empty"
+                status based on the existing files in the specified
+                directory
+        """
+
         if not dest_path:
             return DestinationDirType.INVALID
 

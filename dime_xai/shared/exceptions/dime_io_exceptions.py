@@ -21,6 +21,10 @@ class NLUFileNotFoundException(DIMEIOException):
     pass
 
 
+class InvalidFileExtensionException(DIMEIOException):
+    pass
+
+
 class EmptyNLUDatasetException(DIMEIOException):
     pass
 

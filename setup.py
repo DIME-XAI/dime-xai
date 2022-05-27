@@ -40,7 +40,14 @@ setup(
     package_data={
         # Include special files needed
         # for init project:
-        "": ["*.txt", "*.md", "*.bak"],
+        "": [
+            "dime_instructions.md",
+            "dime_config.yml",
+            "dime_explanations/*",
+            ".dime_cache/*",
+            "data/*",
+            "models/*"
+        ],
     },
     description="Explains DIETClassifier model "
                 "predictions in Rasa chatbot framework.",

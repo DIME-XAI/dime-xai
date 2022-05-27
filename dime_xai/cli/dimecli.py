@@ -31,6 +31,7 @@ from dime_xai.shared.exceptions.dime_core_exceptions import (
 )
 from dime_xai.shared.exceptions.dime_io_exceptions import (
     EmptyNLUDatasetException,
+    InvalidFileExtensionException,
 )
 from dime_xai.utils.io import exit_dime
 
@@ -38,13 +39,27 @@ logger = logging.getLogger(__name__)
 
 
 class DimeCLIExplainer:
+    """
+    Initializes DIME CLI Explainer interface.
+    Calls the relevant explainer classes based
+    on the model type provided in the
+    dime_config.yml configurations.
+    """
     def __init__(
             self,
             configs: Dict = None,
     ) -> NoReturn:
         self.configs = configs
 
-    def run(self):
+    def run(self) -> NoReturn:
+        """
+        Runs the DIME CLI Explainer. Can recognize the model type
+        and call relevant DIME core explainers and pass required
+        configurations
+
+        Returns:
+            no return
+        """
         logger.debug("Initializing DIME CLI Explainer...")
         model_type = self.configs[DIMEConfig.MAIN_KEY_BASE][DIMEConfig.SUB_KEY_BASE_MODEL_TYPE]
         model_mode = self.configs[DIMEConfig.MAIN_KEY_BASE][DIMEConfig.SUB_KEY_BASE_MODEL_MODE]
@@ -105,6 +120,8 @@ class DimeCLIExplainer:
         # Training data exceptions
         except EmptyNLUDatasetException as e:
             logger.error(e)
+        except InvalidFileExtensionException as e:
+            logger.error(e)
         except NLUDataTaggingException as e:
             logger.error(e)
         # Fingerprinting exceptions
@@ -153,6 +170,12 @@ class DimeCLIExplainer:
 
 
 class DimeCLIVisualizer:
+    """
+    Initializes DIME CLI Visualizer interface.
+    Allows loading external explanations and
+    visualize them in the CLI
+    """
+
     def __init__(
             self,
             file_name: Text = None,
@@ -161,7 +184,15 @@ class DimeCLIVisualizer:
         self.file_name = file_name
         self.limit = limit
 
-    def run(self):
+    def run(self) -> NoReturn:
+        """
+        Runs the DIME CLI Visualizer. Passes the explanation
+        file name as an argument to the DIMEExplanation class
+        and invokes visualize method on the explanation object
+
+        Returns:
+            no return
+        """
         logger.debug("Initializing DIME CLI Visualizer...")
 
         try:

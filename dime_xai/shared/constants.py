@@ -3,7 +3,7 @@ from typing import Optional, Text
 
 PACKAGE_NAME = "dime"
 PACKAGE_NAME_PIPY = "dime_xai"
-PACKAGE_VERSION = "0.0.3a5"
+PACKAGE_VERSION = "0.0.4a6"
 PACKAGE_VERSION_LONG = f'DIME Version:{PACKAGE_VERSION}\n[Supported RASA Version:\t2.x.x]'
 RASA_CORE_VERSION = "2.8.8"
 RASA_SDK_VERSION = "2.8.4"
@@ -22,9 +22,11 @@ DEFAULT_VERSION_YAML_TAG = "version"
 DEFAULT_NLU_INTENT_TAG = "intent"
 DEFAULT_NLU_EXAMPLES_TAG = "examples"
 DEFAULT_LATEST_TAG = "latest"
+DEFAULT_DATA_INSTANCES_TAG = "data_instances"
 RASA_MODEL_EXTENSIONS = [".tar.gz"]
 RASA_288_MODEL_REGEX = r"^(\d{8})\-(\d{6}).tar.gz$"
 
+DEFAULT_DATA_INSTANCES_FILE_PATH = "./dime_data_instances.yml"
 DEFAULT_CACHE_PATH = "./.dime_cache"
 
 # fingerprinting
@@ -103,8 +105,7 @@ DEFAULT_DIME_EXPLANATION_GLOBAL_KEYS = ['feature_importance', 'normalized_scores
 DEFAULT_DIME_EXPLANATION_DUAL_KEYS = ['instance', 'global', 'dual']
 DEFAULT_DIME_EXPLANATION_DUAL_SUB_GLOBAL = ['feature_importance', 'feature_selection', 'normalized_scores',
                                             'probability_scores', 'predicted_intent', 'predicted_confidence']
-DEFAULT_DIME_EXPLANATION_DUAL_SUB_DUAL = ['feature_importance', 'normalized_scores', 'probability_scores',
-                                          'test_norm_glob_prob', 'test_norm_dual_prob']
+DEFAULT_DIME_EXPLANATION_DUAL_SUB_DUAL = ['feature_importance', 'normalized_scores', 'probability_scores']
 DEFAULT_VISUALIZATIONS_LIMIT = 10
 
 

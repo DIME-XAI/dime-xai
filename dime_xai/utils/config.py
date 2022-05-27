@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Text
+from typing import Optional, Dict, Text, List
 import logging
 import os
 from collections import OrderedDict as OrderedDictColl
@@ -21,7 +21,7 @@ from dime_xai.shared.constants import (
     FILE_READ_PERMISSION,
     RASA_MODEL_EXTENSIONS,
     Metrics,
-    ALLOWED_RASA_VERSIONS
+    ALLOWED_RASA_VERSIONS, YAML_EXTENSIONS, DEFAULT_DATA_INSTANCES_TAG
 )
 from dime_xai.shared.exceptions.dime_io_exceptions import (
     DIMEConfigException,
@@ -58,6 +58,31 @@ def get_default_configs(
         metric: Text = None,
         case_sensitive: Text = None,
 ) -> Optional[Dict]:
+    """
+    Retrieves the DIME configurations provided
+    in the dime_config.yml file in the DIME
+    project root and validates each config
+    before returning them as a dictionary
+
+    Args:
+        interface: interface where the configs
+            were requested from
+        server_port: server port if required to
+            replace the default server port
+        data_instance: data instance if required
+            to replace the default data instance
+        output_mode: output mode if required to
+            replace the default output mode
+        metric: metric if required to replace
+            the default metric
+        case_sensitive: True if required to preserve
+            case, or else False to turn off case
+            sensitivity. Replaces the default value
+            provided in the dime_config.yml file
+
+    Returns:
+        configurations as a dictionary, or else None
+    """
     try:
         if not interface:
             interface = InterfaceType.INTERFACE_NONE
@@ -168,15 +193,33 @@ def get_default_configs(
                                            DIMEConfig.SUB_KEY_BASE_CASE_SENSITIVITY]:
                         raise InvalidConfigValueException(f"'{s}' of '{key}' cannot be empty")
 
-                # TODO: Enable reading data instances from a file,
-                #  possibly a yml
-                if isinstance(key_content_dict[DIMEConfig.SUB_KEY_BASE_DATA_INSTANCE], str):
-                    key_content_dict[DIMEConfig.SUB_KEY_BASE_DATA_INSTANCE] = \
-                        [key_content_dict[DIMEConfig.SUB_KEY_BASE_DATA_INSTANCE]]
+                # validate list of instances
+                if isinstance(key_content_dict[DIMEConfig.SUB_KEY_BASE_DATA_INSTANCE], List):
+                    if len(key_content_dict[DIMEConfig.SUB_KEY_BASE_DATA_INSTANCE]) == 1:
+                        key_content_dict[DIMEConfig.SUB_KEY_BASE_DATA_INSTANCE] = \
+                            key_content_dict[DIMEConfig.SUB_KEY_BASE_DATA_INSTANCE][0]
 
-                if isinstance(key_content_dict[DIMEConfig.SUB_KEY_BASE_LANGUAGES], str):
-                    key_content_dict[DIMEConfig.SUB_KEY_BASE_LANGUAGES] = \
-                        [key_content_dict[DIMEConfig.SUB_KEY_BASE_LANGUAGES]]
+                if isinstance(key_content_dict[DIMEConfig.SUB_KEY_BASE_DATA_INSTANCE], Text):
+                    file_path = key_content_dict[DIMEConfig.SUB_KEY_BASE_DATA_INSTANCE]
+
+                    if file_exists(file_path=file_path):
+                        file_extension = os.path.splitext(file_path)[-1]
+                        if file_extension not in YAML_EXTENSIONS:
+                            raise InvalidConfigValueException(f"specified data instances file "
+                                                              f"must be a YAML file")
+                        else:
+                            data_instances_file_content = read_yaml_file(file_path)
+                            if DEFAULT_DATA_INSTANCES_TAG not in data_instances_file_content:
+                                raise InvalidConfigPropertyException(f"could not find 'data_instances' "
+                                                                     f"key in the specified data instances "
+                                                                     f"YAML file")
+                            instances = data_instances_file_content[DEFAULT_DATA_INSTANCES_TAG]
+                            key_content_dict[DIMEConfig.SUB_KEY_BASE_DATA_INSTANCE] = \
+                                instances if isinstance(instances, List) else [instances]
+
+                    else:
+                        key_content_dict[DIMEConfig.SUB_KEY_BASE_DATA_INSTANCE] = \
+                            [key_content_dict[DIMEConfig.SUB_KEY_BASE_DATA_INSTANCE]]
 
                 valid_instances = list()
                 for instance in key_content_dict[DIMEConfig.SUB_KEY_BASE_DATA_INSTANCE]:
@@ -190,6 +233,11 @@ def get_default_configs(
                                                       f"'dime_config.yml' file")
                 else:
                     key_content_dict[DIMEConfig.SUB_KEY_BASE_DATA_INSTANCE] = valid_instances
+
+                # validate list of languages
+                if isinstance(key_content_dict[DIMEConfig.SUB_KEY_BASE_LANGUAGES], str):
+                    key_content_dict[DIMEConfig.SUB_KEY_BASE_LANGUAGES] = \
+                        [key_content_dict[DIMEConfig.SUB_KEY_BASE_LANGUAGES]]
 
                 invalid_languages = list()
                 for lang in key_content_dict[DIMEConfig.SUB_KEY_BASE_LANGUAGES]:

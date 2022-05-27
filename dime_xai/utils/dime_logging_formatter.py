@@ -2,6 +2,7 @@ import logging
 import re
 from copy import copy
 from logging import Formatter
+from typing import Text
 
 from dime_xai.shared.constants import (
     TermColor,
@@ -20,13 +21,28 @@ MAPPING = {
 PREFIX = '\033['
 SUFFIX = '\033[0m'
 
+logger = logging.getLogger(__name__)
+
 
 class DIMELoggingFormatter(Formatter):
+    """
+    A custom logging formatter for DIME
+    """
 
     def __init__(self, format_str):
         Formatter.__init__(self, format_str)
 
-    def format(self, record):
+    def format(self, record) -> Text:
+        """
+        Formats a given logging record by
+        wrapping it with required color codes
+
+        Args:
+            record: logging record to be wrapped
+
+        Returns:
+            formatted logging record
+        """
         record_cpy = copy(record)
         try:
             formatted_record = Formatter.format(self, record_cpy)
@@ -51,13 +67,29 @@ class DIMELoggingFormatter(Formatter):
 
             return formatted_record
         except Exception as e:
-            exception_details = e
+            logger.debug(e)
             return Formatter.format(self, record_cpy)
 
 
 class MaxLevelFilter(logging.Filter):
+    """
+    Sets a filter to the logging level
+    """
     def __init__(self, level):
+        super().__init__(name='')
         self.level = level
 
-    def filter(self, record):
+    def filter(self, record) -> bool:
+        """
+        filters a given logging record and
+        returns True if logging levels falls
+        under the specified max logging level
+
+        Args:
+            record: logging record to be inspected
+
+        Returns:
+            True if logging level is less than max
+                logging level, or else False
+        """
         return record.levelno < self.level

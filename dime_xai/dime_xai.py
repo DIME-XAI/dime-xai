@@ -2,7 +2,7 @@ import argparse
 import logging
 import os
 import sys
-from typing import Optional
+from typing import NoReturn
 
 from dime_xai.cli.dimecli import DimeCLIExplainer, DimeCLIVisualizer
 from dime_xai.server.dimeserver import DIMEServer
@@ -171,14 +171,30 @@ def create_argument_parser():
     return parser
 
 
-def _set_logging_level(debug: bool = False):
+def _set_logging_level(debug: bool = False) -> NoReturn:
+    """
+    Sets logging level of DIME
+    internally when the debug level
+    is passed as a boolean argument
+    Args:
+        debug: debugging as a boolean value
+
+    Returns:
+        no return
+    """
     if debug:
         logger.setLevel(level=logging.DEBUG)
     else:
         logger.setLevel(level=logging.INFO)
 
 
-def run_dime_cli() -> Optional:
+def run_dime_cli() -> NoReturn:
+    """
+    Runs the main DIME CLI Interface. Invokes the relevant Interface
+    from cli, server, and creates a starter DIME project on init.
+    Returns:
+        no return
+    """
     try:
         logger.debug("Running main DIME CLI.")
         arg_parser = create_argument_parser()

@@ -234,7 +234,11 @@ def feature_selection(
         list(ranked_tokens.values())[0:ranking_length],
     ))
 
-    return selected_tokens
+    pruned_tokens = {
+        k: v for k, v in selected_tokens.items()
+        if v != 0
+    }
+    return pruned_tokens
 
 
 def apply_smoothing(

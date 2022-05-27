@@ -90,7 +90,7 @@ class RASAModel(Model):
             self._nlu_model = Interpreter.load(nlu_model)
         except Exception:
             raise ModelLoadException(f"An error occurred while loading "
-                                     f"the RASA model '{model_name}")
+                                     f"the RASA model '{model_name}'")
 
         if self._nlu_model:
             self._metadata = self._nlu_model.model_metadata.metadata
@@ -109,10 +109,10 @@ class RASAModel(Model):
             logger.info(f'Error occurred while loading the RASA model: {self._model_name}')
             exit_dime()
 
-    def _load_latest_model(self) -> NoReturn:
+    def load_latest_model(self) -> NoReturn:
         """
-        An internal method which can load the latest local RASA model
-        available in the './models' directory of the DIME project root.
+        Loads the latest local RASA model available in the
+        './models' directory of the DIME project root.
 
         Returns:
             no return
@@ -278,7 +278,11 @@ class RASAModel(Model):
     def _parse_rest(self, data_instance: Text) -> Response:
         try:
             request_body = {'text': data_instance}
-            return requests.post(url=self._url + RASA_REST_ENDPOINT_PARSE, json=request_body)
+            response = requests.post(url=self._url + RASA_REST_ENDPOINT_PARSE, json=request_body)
+            if response.status_code != 200:
+                raise Exception
+
+            return response
         except Exception:
             raise RESTModelLoadException(f"Exception occurred while parsing the RASA REST model")
 
@@ -475,7 +479,7 @@ class RASAModel(Model):
         else:
             raw_response = self._parse_rest(data_instance='test')
             diet_labels = [x['name'] for x in raw_response.json()['intent_ranking']] \
-                if 'intent_ranking' in raw_response else []
+                if 'intent_ranking' in raw_response.json() else []
 
         intents.append(NLU_FALLBACK_TAG)
         unique_labels = sorted(list(set(intents)))
