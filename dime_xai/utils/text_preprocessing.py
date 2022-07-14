@@ -1,4 +1,5 @@
 from typing import Text, Optional, List, Union, Dict
+from copy import deepcopy
 import regex
 
 from dime_xai.utils.io import get_unique_list
@@ -59,7 +60,7 @@ def bag_of_words(
         bag of words list for a string or a merged list of strings [List],
             bag of words list per each string in a list of strings [Dict], or None
     """
-    instances_copy = instances
+    instances_copy = deepcopy(instances)
     if not instances_copy:
         return None
 
@@ -114,7 +115,7 @@ def get_all_tokens(
             for a list of unmerged strings, returns the list
             of tokens per each string instance as a dictionary
     """
-    instances_copy = instances
+    instances_copy = deepcopy(instances)
     if not instances_copy:
         return None
 
@@ -170,7 +171,7 @@ def remove_token_from_dataset(
     Returns:
         token removed list or dictionary
     """
-    testing_data_copy = testing_data.copy()
+    testing_data_copy = deepcopy(testing_data)
 
     if isinstance(testing_data_copy, Dict):
         for intent, examples in testing_data_copy.items():

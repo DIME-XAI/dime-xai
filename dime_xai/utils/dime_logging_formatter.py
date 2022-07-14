@@ -67,7 +67,8 @@ class DIMELoggingFormatter(Formatter):
 
             return formatted_record
         except Exception as e:
-            logger.debug(e)
+            # disabled logging to  a fix recursion issue
+            # logger.debug(e)
             return Formatter.format(self, record_cpy)
 
 

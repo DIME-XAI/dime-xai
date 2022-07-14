@@ -1,13 +1,15 @@
 import logging
 import os
+import pathlib
 import re
 import sys
+from collections import OrderedDict as OrderedDictColl
 from datetime import datetime
 from os import path
-import pathlib
-from collections import OrderedDict as OrderedDictColl
-from typing import List, Optional, Text, OrderedDict, Dict, NoReturn
+from typing import List, Optional, Text, OrderedDict, Dict, NoReturn, Union, Tuple
 from uuid import uuid4
+
+from rasa.shared.data import get_data_files, is_nlu_file
 from ruamel import yaml as yaml
 from ruamel.yaml.error import YAMLError
 
@@ -26,12 +28,14 @@ from dime_xai.shared.constants import (
     RASA_MODEL_EXTENSIONS,
     RASA_288_MODEL_REGEX,
     DEFAULT_CASE_SENSITIVE_MODE,
+    DEFAULT_LATEST_TAG,
 )
 from dime_xai.shared.exceptions.dime_io_exceptions import (
     YAMLFormatException,
     NLUFileNotFoundException,
     ModelNotFoundException,
     InvalidFileExtensionException,
+    FileSizeInspectingException,
 )
 
 logger = logging.getLogger(__name__)
@@ -179,7 +183,7 @@ def get_timestamp_str(sep: Text = "-", uuid: bool = False) -> Text:
         timestamped string
     """
     if uuid:
-        return datetime.now().strftime('%Y%m%d' + sep + '%H%M%S' + sep)\
+        return datetime.now().strftime('%Y%m%d' + sep + '%H%M%S' + sep) \
                + str(uuid4())
     else:
         return datetime.now().strftime('%Y%m%d' + sep + '%H%M%S')
@@ -211,6 +215,32 @@ def file_exists(file_path: Text = None) -> bool:
         True if path exists, else False
     """
     return path.exists(file_path) and path.isfile(file_path)
+
+
+def file_size(file_path: Union[Text, List], reverese: bool = False) -> Union[Dict, Tuple[float, Text]]:
+    try:
+        if isinstance(file_path, Text):
+            size_in_bytes = os.path.getsize(file_path)
+            if size_in_bytes >= 1000000000:
+                size = size_in_bytes / 1000000000
+                units = "GB"
+            elif size_in_bytes >= 1000000:
+                size = size_in_bytes / 1000000
+                units = "MB"
+            elif size_in_bytes >= 1000:
+                size = size_in_bytes / 1000
+                units = "KB"
+            else:
+                size = size_in_bytes
+                units = "Bytes"
+            return size, units
+        else:
+            if reverese:
+                file_path.reverse()
+            file_sizes_dict = {file: file_size(file_path=file) for file in file_path}
+            return file_sizes_dict
+    except Exception as e:
+        raise FileSizeInspectingException(e)
 
 
 def is_bot_root() -> bool:
@@ -472,7 +502,7 @@ def set_cli_color(text_content: Text = None, color: str = TermColor.NONE_C):
     return color + str(text_content) + TermColor.END_C
 
 
-def exit_dime(exit_code: int = 1, error_message: Text = None) -> NoReturn:
+def exit_dime(exit_code: Union[int, Text] = 1, error_message: Text = None) -> NoReturn:
     """
     Prints error or exception message and
     exits the DIME CLI
@@ -552,3 +582,44 @@ def update_sys_path(path_to_add: Text) -> NoReturn:
         no return
     """
     sys.path.insert(0, path_to_add)
+
+
+def series_to_json_serializable(series: Union[Dict, List]):
+    if isinstance(series, dict):
+        return {k: float(v) for k, v in series.items()}
+    elif isinstance(series, list):
+        return [float(v) for v in series]
+
+
+def testing_data_dir_exists(dir_path: Text) -> bool:
+    if not os.path.exists(dir_path):
+        return False
+
+    data_list = get_data_files(paths=[dir_path], filter_predicate=is_nlu_file)
+    if len(data_list) == 0:
+        return False
+
+    return True
+
+
+def rasa_models_dir_exists(dir_path: Text) -> bool:
+    if not os.path.exists(dir_path):
+        return False
+
+    models = _get_dir_file_list(dir_path=dir_path, file_suffixes=RASA_MODEL_EXTENSIONS)
+    if len(models) == 0:
+        return False
+
+    return True
+
+
+def rasa_model_exists(models_path: Text, model_name: Text) -> bool:
+    if str(model_name).lower() == DEFAULT_LATEST_TAG:
+        return True
+
+    if not re.fullmatch(RASA_288_MODEL_REGEX, model_name):
+        return False
+
+    if file_exists(file_path=os.path.join(models_path, model_name)):
+        return True
+    return False

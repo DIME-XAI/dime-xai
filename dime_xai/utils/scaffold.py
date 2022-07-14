@@ -74,13 +74,13 @@ class DIMEInit:
                 shutil.copytree(
                     src=self.src_path,
                     dst=self.cache_path_timestamped_path,
-                    ignore=shutil.ignore_patterns('__init__.py', '__pycache__', '__main__.py', 'data', 'models'),
+                    ignore=shutil.ignore_patterns('__pycache__', '__main__.py', 'data', 'models'),
                 )
             elif dest_dir_type == DestinationDirType.VALID or dest_dir_type == DestinationDirType.EMPTY:
                 shutil.copytree(
                     src=self.src_path,
                     dst=self.cache_path_timestamped_path,
-                    ignore=shutil.ignore_patterns('__init__.py', '__pycache__', '__main__.py'),
+                    ignore=shutil.ignore_patterns('__pycache__', '__main__.py'),
                 )
             elif dest_dir_type == DestinationDirType.DIME:
                 raise DIMEProjectExistsException("The initialization directory already contains a DIME project. "
@@ -98,6 +98,7 @@ class DIMEInit:
                 rel_dst_path = os.path.join(dest_path, elem)
                 shutil.move(src=abs_src_path, dst=rel_dst_path)
             shutil.rmtree(path=self.cache_path_timestamped_path)
+            os.remove(path=os.path.join("./", "__init__.py"))
 
             logger.info("Initialized a new dime project.")
         except Exception as e:

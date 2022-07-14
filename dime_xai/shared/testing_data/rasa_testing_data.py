@@ -1,5 +1,6 @@
 import logging
 import os
+from copy import deepcopy
 from typing import List, Optional, Text, NoReturn, Union, Dict
 
 import pandas as pd
@@ -174,7 +175,7 @@ class RASATestingData(TestingData):
             dataset.drop(columns=['index'], inplace=True)
             return dataset
         else:
-            return tagged_data
+            return deepcopy(tagged_data)
 
     def get_instances(
             self,

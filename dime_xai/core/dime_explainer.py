@@ -50,6 +50,7 @@ class DIMEExplainer:
             testing_data_version: Text = DEFAULT_NLU_YAML_VERSION,
             model_type: Text = DEFAULT_MODEL_TYPE,
             output_mode: Text = DEFAULT_OUTPUT_MODE,
+            quiet_mode: bool = False,
     ):
         self.models_path = models_path
         self.model_name = model_name
@@ -72,3 +73,4 @@ class DIMEExplainer:
         self.testing_data_version = testing_data_version
         self.model_type = model_type
         self.output_mode = output_mode
+        self.quiet_mode = quiet_mode

@@ -4,8 +4,13 @@ import os
 import sys
 from typing import NoReturn
 
-from dime_xai.cli.dimecli import DimeCLIExplainer, DimeCLIVisualizer
-from dime_xai.server.dimeserver import DIMEServer
+from dotenv import load_dotenv
+
+from dime_xai.cli.dime_cli import (
+    DimeCLIExplainer,
+    DimeCLIVisualizer,
+)
+from dime_xai.server.dime_server import DIMEServer
 from dime_xai.shared.constants import (
     InterfaceType,
     TermColor,
@@ -14,8 +19,10 @@ from dime_xai.shared.constants import (
     OUTPUT_MODE_DUAL,
     PACKAGE_VERSION_LONG,
     Metrics,
+    LoggingLevel,
 )
-from dime_xai.utils.config import get_default_configs
+from dime_xai.utils import process
+from dime_xai.utils.config import get_init_configs
 from dime_xai.utils.dime_logging_formatter import (
     DIMELoggingFormatter,
     MaxLevelFilter,
@@ -29,6 +36,7 @@ from dime_xai.utils.io import (
 )
 from dime_xai.utils.scaffold import DIMEInit
 
+load_dotenv()
 logger = logging.getLogger()
 update_sys_path(os.getcwd())
 
@@ -127,6 +135,17 @@ def create_argument_parser():
         action="store_true",
         help="sets the logging level to debug mode from info.",
     )
+    parser_explainer.add_argument(
+        "-r",
+        "--request-id",
+        type=str,
+        help="request id sent from the DIME server.",
+    )
+    parser_explainer.add_argument(
+        "--quiet",
+        action="store_true",
+        help="sets the logging level to off.",
+    )
 
     parser_visualizer = subparsers.add_parser(
         name="visualize",
@@ -164,26 +183,39 @@ def create_argument_parser():
         help="sets the logging level to debug mode from info.",
     )
     parser_init.add_argument(
-        "--quite",
+        "--quiet",
         action="store_true",
         help="initializes a starter dime project without prompting the user for a project location.",
     )
     return parser
 
 
-def _set_logging_level(debug: bool = False) -> NoReturn:
+def _set_logging_level(level: LoggingLevel = LoggingLevel.INFO) -> NoReturn:
     """
     Sets logging level of DIME
     internally when the debug level
     is passed as a boolean argument
     Args:
-        debug: debugging as a boolean value
+        level: logging level as an integer value
 
     Returns:
         no return
     """
-    if debug:
+
+    if level == LoggingLevel.NOTSET:
+        logger.setLevel(level=logging.NOTSET)
+    elif level == LoggingLevel.DEBUG:
         logger.setLevel(level=logging.DEBUG)
+    elif level == LoggingLevel.INFO:
+        logger.setLevel(level=logging.INFO)
+    elif level == LoggingLevel.WARNING:
+        logger.setLevel(level=logging.WARNING)
+    elif level == LoggingLevel.ERROR:
+        logger.setLevel(level=logging.ERROR)
+    elif level == LoggingLevel.CRITICAL:
+        logger.setLevel(level=logging.CRITICAL)
+    elif level == LoggingLevel.QUIET:
+        logging.disable(level=logging.CRITICAL)
     else:
         logger.setLevel(level=logging.INFO)
 
@@ -208,13 +240,15 @@ def run_dime_cli() -> NoReturn:
             return
 
         if str(interface).lower() == InterfaceType.INTERFACE_INIT:
-            quite = cmdline_args.quite
+            quiet = cmdline_args.quiet
             debug_mode = cmdline_args.debug
             if debug_mode:
-                _set_logging_level(debug=debug_mode)
+                _set_logging_level(level=LoggingLevel.DEBUG)
+            else:
+                _set_logging_level(level=LoggingLevel.INFO)
 
             try:
-                if not quite:
+                if not quiet:
                     print(set_cli_color(text_content="👋🏽 Hi there! Welcome to DIME.", color=TermColor.LIGHTGREEN))
                     dest_dir = input(set_cli_color(
                         text_content="In which directory do you want to "
@@ -238,9 +272,11 @@ def run_dime_cli() -> NoReturn:
             server_port = cmdline_args.port
             debug_mode = cmdline_args.debug
             if debug_mode:
-                _set_logging_level(debug=debug_mode)
+                _set_logging_level(level=LoggingLevel.DEBUG)
+            else:
+                _set_logging_level(level=LoggingLevel.INFO)
 
-            configs = get_default_configs(
+            configs = get_init_configs(
                 interface=InterfaceType.INTERFACE_SERVER,
                 server_port=server_port,
             )
@@ -262,24 +298,39 @@ def run_dime_cli() -> NoReturn:
             metric = cmdline_args.metric
             case_sensitive = cmdline_args.case
             debug_mode = cmdline_args.debug
+            quiet_mode = cmdline_args.quiet
+            request_id = cmdline_args.request_id
 
             if debug_mode:
-                _set_logging_level(debug=debug_mode)
+                _set_logging_level(level=LoggingLevel.DEBUG)
+            if quiet_mode:
+                _set_logging_level(level=LoggingLevel.QUIET)
 
-            configs = get_default_configs(
+                if not request_id:
+                    logger.error("Invalid Request ID received")
+                    exit_dime("invalid request id error")
+
+                process_q = process.ProcessQueue()
+                data_instance = process_q.get_metadata(request_id=request_id)
+
+            configs = get_init_configs(
                 interface=InterfaceType.INTERFACE_CLI,
                 data_instance=data_instance,
                 output_mode=output_mode,
                 metric=metric,
                 case_sensitive=case_sensitive,
+                quiet_mode=True if quiet_mode else False
             )
+
             if not configs:
                 logger.error("Failed to retrieve default dime "
                              "configs. DIME CLI will be terminated.")
-                return
+                exit_dime("config error")
 
             dime_cli_explainer = DimeCLIExplainer(
                 configs=configs,
+                quiet_mode=True if quiet_mode else False,
+                request_id=request_id if quiet_mode else None,
             )
             dime_cli_explainer.run()
 
@@ -289,7 +340,9 @@ def run_dime_cli() -> NoReturn:
             debug_mode = cmdline_args.debug
 
             if debug_mode:
-                _set_logging_level(debug=debug_mode)
+                _set_logging_level(level=LoggingLevel.DEBUG)
+            else:
+                _set_logging_level(level=LoggingLevel.INFO)
 
             if not explanation_file:
                 logger.error("A DIME explanation file must be "

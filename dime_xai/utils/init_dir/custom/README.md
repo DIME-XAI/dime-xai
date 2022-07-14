@@ -1,0 +1,1 @@
+this package contains all custom rasa components

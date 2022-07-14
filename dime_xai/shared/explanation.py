@@ -21,6 +21,10 @@ from dime_xai.shared.constants import (
     DEFAULT_DIME_EXPLANATION_DUAL_SUB_GLOBAL,
     DEFAULT_DIME_EXPLANATION_DUAL_SUB_DUAL,
     DEFAULT_DIME_EXPLANATION_DUAL_KEYS,
+    ExplanationType,
+    FILE_ENCODING_UTF8,
+    FILE_READ_PERMISSION,
+    FILE_WRITE_PERMISSION,
 )
 from dime_xai.shared.exceptions.dime_core_exceptions import (
     InvalidDIMEExplanationFilePath,
@@ -51,7 +55,7 @@ class DIMEExplanation:
             self.file_name = explanation
 
             try:
-                with open(full_file_path, encoding='utf8', mode='r') as file:
+                with open(full_file_path, encoding=FILE_ENCODING_UTF8, mode=FILE_READ_PERMISSION) as file:
                     self.explanation = json.load(file)
             except Exception as e:
                 raise DIMEExplanationFileLoadException(f"Error occurred while reading "
@@ -60,6 +64,7 @@ class DIMEExplanation:
             self.file_name = DEFAULT_PERSIST_FILE + "_" + \
                              get_timestamp_str(sep="_") + \
                              DEFAULT_PERSIST_EXTENSION
+            explanation['filename'] = self.file_name
             self.explanation = explanation
 
         if not self._validate():
@@ -101,7 +106,7 @@ class DIMEExplanation:
                                                          "be persisted.")
 
         try:
-            with open(full_file_path, encoding='utf8', mode='w') as file:
+            with open(full_file_path, encoding=FILE_ENCODING_UTF8, mode=FILE_WRITE_PERMISSION) as file:
                 json.dump(self.explanation, file, indent=4, ensure_ascii=False)
 
             logger.info(f"DIME explanations were persisted in dime_explanations directory under "
@@ -174,7 +179,7 @@ class DIMEExplanation:
         return True
 
     def inspect(self) -> NoReturn:
-        exp_json = json.dumps(self.explanation, indent=4, ensure_ascii=False).encode('utf8')
+        exp_json = json.dumps(self.explanation, indent=4, ensure_ascii=False).encode(FILE_ENCODING_UTF8)
         print(f"\nDIME Explanations [Raw]: \n\n{exp_json.decode()}\n")
 
     @staticmethod
@@ -240,7 +245,7 @@ class DIMEExplanation:
                                  f"Global feature importance scores (Raw): \t" \
                                  f"{', '.join(gfi)}\n" \
                                  f"Selected token list based on global score: \t" \
-                                 f"{', '.join(gfs)}\n" \
+                                 f"{', '.join(gfs) if gfs else 'None'}\n" \
                                  f"Global feature importance scores (Normalized): \t" \
                                  f"{', '.join(gfw)}\n" \
                                  f"Global feature importance probability scores: \t" \
@@ -302,9 +307,32 @@ class DIMEExplanation:
 
             for instance in self.explanation['dual']:
                 self._visualize_global(title='DUAL', main_description=main_description, instance=instance)
-                self._visualize_dual(instance=instance)
+
+                if instance['global']['feature_selection']:
+                    self._visualize_dual(instance=instance)
+                else:
+                    logger.warning(f"Dual feature importance cannot be visualized since feature selection is an empty "
+                                   f"array")
 
         else:
             logger.error(f"The output_mode specified for the explanation "
                          f"is invalid. Could not visualize the given DIME "
                          f"explanation")
+
+    def get_explanation(self, output_type: Text = ExplanationType.DICT) -> Optional[Union[Dict, Text]]:
+        if not output_type or output_type not in [ExplanationType.JSON, ExplanationType.DICT, ExplanationType.QUIET]:
+            return None
+        elif output_type == ExplanationType.DICT:
+            return self.explanation
+        elif output_type == ExplanationType.JSON:
+            exp_json = json.dumps(self.explanation, indent=4, ensure_ascii=False).encode(FILE_ENCODING_UTF8)
+            decoded_json = exp_json.decode()
+            return decoded_json
+        elif output_type == ExplanationType.QUIET:
+            output = self.explanation.copy()
+            output["filename"] = self.file_name
+            exp_json = json.dumps(output, indent=4, ensure_ascii=False).encode(FILE_ENCODING_UTF8)
+            decoded_json = exp_json.decode()
+            return decoded_json
+        else:
+            return None

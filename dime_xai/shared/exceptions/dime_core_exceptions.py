@@ -1,69 +1,85 @@
 from dime_xai.shared.exceptions.dime_base_exception import DIMEBaseException
 
 
-class InvalidDIMEExplanationFilePath(DIMEBaseException):
+class DIMECoreException(DIMEBaseException):
     pass
 
 
-class NotImplementedException(DIMEBaseException):
+class InvalidDIMEExplanationFilePath(DIMECoreException):
     pass
 
 
-class DIMEExplanationFileLoadException(DIMEBaseException):
+class NotImplementedException(DIMECoreException):
     pass
 
 
-class DIMEExplanationDirectoryException(DIMEBaseException):
+class DIMEExplanationFileLoadException(DIMECoreException):
     pass
 
 
-class DIMEExplanationFileExistsException(DIMEBaseException):
+class DIMEExplanationDirectoryException(DIMECoreException):
     pass
 
 
-class DIMEExplanationFilePersistException(DIMEBaseException):
+class DIMEExplanationFileExistsException(DIMECoreException):
     pass
 
 
-class InvalidDIMEExplanationStructure(DIMEBaseException):
+class DIMEExplanationFilePersistException(DIMECoreException):
     pass
 
 
-class RESTModelLoadException(DIMEBaseException):
+class InvalidDIMEExplanationStructure(DIMECoreException):
     pass
 
 
-class ModelFingerprintPersistException(DIMEBaseException):
+class RasaModelLoadException(DIMECoreException):
     pass
 
 
-class DataFingerprintPersistException(DIMEBaseException):
+class RESTModelLoadException(DIMECoreException):
     pass
 
 
-class DIMEFingerprintPersistException(DIMEBaseException):
+class ModelFingerprintPersistException(DIMECoreException):
     pass
 
 
-class InvalidIntentSpecifiedException(DIMEBaseException):
+class DataFingerprintPersistException(DIMECoreException):
     pass
 
 
-class InvalidMetricSpecifiedException(DIMEBaseException):
+class DIMEFingerprintPersistException(DIMECoreException):
     pass
 
 
-class InvalidIntentRankingException(DIMEBaseException):
+class InvalidIntentSpecifiedException(DIMECoreException):
     pass
 
 
-class NLUDataTaggingException(DIMEBaseException):
+class InvalidMetricSpecifiedException(DIMECoreException):
     pass
 
 
-class InvalidNLUTagException(DIMEBaseException):
+class InvalidIntentRankingException(DIMECoreException):
     pass
 
 
-class EmptyIntentRankingException(DIMEBaseException):
+class NLUDataTaggingException(DIMECoreException):
+    pass
+
+
+class InvalidNLUTagException(DIMECoreException):
+    pass
+
+
+class EmptyIntentRankingException(DIMECoreException):
+    pass
+
+
+class DatasetParseException(DIMECoreException):
+    pass
+
+
+class RasaExplainerException(DIMECoreException):
     pass

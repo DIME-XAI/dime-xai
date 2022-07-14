@@ -18,6 +18,8 @@ from dime_xai.shared.constants import (
 from dime_xai.shared.exceptions.dime_core_exceptions import (
     RESTModelLoadException,
     ModelFingerprintPersistException,
+    DatasetParseException,
+    RasaModelLoadException,
 )
 from dime_xai.shared.exceptions.dime_io_exceptions import (
     ModelNotFoundException,
@@ -26,7 +28,6 @@ from dime_xai.shared.exceptions.dime_io_exceptions import (
 from dime_xai.shared.model.model import Model
 from dime_xai.utils.fingerprint import generate_model_fingerprint
 from dime_xai.utils.io import (
-    exit_dime,
     get_latest_model_name,
     file_exists,
 )
@@ -46,10 +47,12 @@ class RASAModel(Model):
             models_path: Text = None,
             model_name: Text = None,
             url: Text = None,
+            quiet_mode: bool = False,
     ) -> NoReturn:
         self._model_mode = model_mode
         self._models_path = models_path
         self._model_name = model_name
+        self.quiet_mode = quiet_mode
         self._url = url
         self._nlu_model = None
         self._metadata = dict()
@@ -107,7 +110,7 @@ class RASAModel(Model):
             logger.info(f'Successfully loaded RASA model: {self._model_name}')
         else:
             logger.info(f'Error occurred while loading the RASA model: {self._model_name}')
-            exit_dime()
+            raise RasaModelLoadException()
 
     def load_latest_model(self) -> NoReturn:
         """
@@ -295,9 +298,10 @@ class RASAModel(Model):
         rasa_responses = list()
         try:
             if is_supervised:
-                tqdm_dataset = tqdm(dataset.items())
-                tqdm_dataset.set_description(f"{description}")
-                for intent, examples in tqdm_dataset:
+                if not self.quiet_mode:
+                    dataset = tqdm(dataset.items())
+                    dataset.set_description(f"{description}")
+                for intent, examples in dataset:
                     with ThreadPoolExecutor(max_workers=os.cpu_count() * 5) as executor:
                         for example in examples:
                             future = executor.submit(
@@ -307,8 +311,9 @@ class RASAModel(Model):
                             rasa_responses.append([example, intent, future])
                 return self._process_supervised_batch_output(rasa_responses)
             else:
-                tqdm_dataset = tqdm(dataset)
-                for example in tqdm_dataset:
+                if not self.quiet_mode:
+                    dataset = tqdm(dataset)
+                for example in dataset:
                     with ThreadPoolExecutor(max_workers=os.cpu_count() * 5) as executor:
                         future = executor.submit(
                             self._parse_rest,
@@ -318,7 +323,7 @@ class RASAModel(Model):
                 return self._process_unsupervised_batch_output(rasa_responses)
         except Exception as e:
             logger.error(f"Exception occurred. {e}")
-            exit_dime()
+            raise DatasetParseException(e)
 
     def _parse_tagged_batch(
             self,
@@ -347,10 +352,11 @@ class RASAModel(Model):
             parsing_function = self._parse_rest
 
         try:
-            tqdm_dataset = tqdm(dataset)
-            tqdm_dataset.set_description(f"{description}")
+            if not self.quiet_mode:
+                dataset = tqdm(dataset)
+                dataset.set_description(f"{description}")
             if use_threading:
-                for instance in tqdm_dataset:
+                for instance in dataset:
                     example = instance['example']
                     with ThreadPoolExecutor(max_workers=os.cpu_count() * 5) as executor:
                         future = executor.submit(
@@ -374,14 +380,16 @@ class RASAModel(Model):
             self,
             dataset: Union[Dict, List],
             is_supervised: bool = True,
-            description: Text = ""
+            description: Text = "",
     ) -> List:
         local_responses = list()
         try:
             if is_supervised:
-                tqdm_dataset = tqdm(dataset.items())
-                tqdm_dataset.set_description(f"{description}")
-                for intent, examples in tqdm_dataset:
+                if not self.quiet_mode:
+                    dataset = tqdm(dataset.items())
+                    dataset.set_description(f"{description}")
+
+                for intent, examples in dataset:
                     with ThreadPoolExecutor(max_workers=os.cpu_count() * 5) as executor:
                         for example in examples:
                             future = executor.submit(
@@ -391,8 +399,9 @@ class RASAModel(Model):
                             local_responses.append([example, intent, future])
                 return self._process_supervised_batch_output(local_responses)
             else:
-                tqdm_dataset = tqdm(dataset)
-                for example in tqdm_dataset:
+                if not self.quiet_mode:
+                    dataset = tqdm(dataset)
+                for example in dataset:
                     with ThreadPoolExecutor(max_workers=os.cpu_count() * 5) as executor:
                         future = executor.submit(
                             self._parse_local,
@@ -401,10 +410,9 @@ class RASAModel(Model):
                         local_responses.append([example, future])
                 return self._process_unsupervised_batch_output(local_responses)
         except KeyboardInterrupt:
-            raise KeyboardInterrupt
+            raise KeyboardInterrupt()
         except Exception as e:
-            logger.error(f"Exception occurred. {e}")
-            exit_dime()
+            raise DatasetParseException(e)
 
     def parse_supervised(self, data_instance: Dict) -> Dict:
         if self._model_mode == MODEL_MODE_LOCAL:

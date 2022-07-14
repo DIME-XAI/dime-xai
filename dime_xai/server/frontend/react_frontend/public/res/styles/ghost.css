@@ -1,0 +1,168 @@
+/*
+Simple animated ghost from @MirkoWD
+
+Setup:
+-Remove .body
+-To remove the animation simply delete the code inside the ANIMATION tags
+-The image is fully responsive, simple change the height and width of .ghost-canvas
+*/
+
+body{
+    background-color: #212121;
+}
+/*Canvas that contains the ghost, change this values to move around ar resize the ghost*/
+.ghost-canvas{
+    position: relative;
+    width: 300px;
+    height: 200px;
+    margin: 100px auto 0 auto;
+}
+
+.ghost-body{
+    position: absolute;
+    height: 28%;
+    width: 22%;
+    background-color: #E0E0E0;
+    left: 40%;
+    top:  33%;
+  /*ANIMATION START*/
+    animation-name: floating;
+    animation-duration: 10s;
+    animation-timing-function:linear;
+    animation-iteration-count: infinite;
+  /*ANIMATION END*/
+}
+.ghost-body-copy{
+    position: absolute;
+    height: 28%;
+    width: 22%;
+    background-color: #E0E0E0;
+    left: 40%;
+    top:  33%;
+    z-index: 1;
+}
+
+.ghost-head{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: -50%;
+    background-color: #E0E0E0;
+    border-radius: 90px;
+
+}
+.eye-right{
+    position: absolute;
+    height: 22%;
+    width: 20%;
+    right: 22%;
+    top: 40%;
+    background-color: black;
+    border-radius: 50%;
+}
+.eye-left{
+    position: absolute;
+    height: 22%;
+    width: 20%;
+    left: 22%;
+    top: 40%;
+    background-color: black;
+    border-radius: 50%;
+}
+.mouth{
+    position: absolute;
+    height: 26%;
+    width: 24%;
+    left: 38%;
+    top: 70%;
+    background-color: black;
+    border-radius: 50%;
+    z-index: 2
+}
+.down-bubble{
+    position: absolute;
+    height: 55%;
+    width: 100%;
+    top:70%;
+}
+
+.bubble-1{
+    position: absolute;
+    height: 100%;
+    width:25%;
+    background-color: #E0E0E0;
+    border-bottom-left-radius: 50px;
+    border-bottom-right-radius: 50px;
+  /*ANIMATION START*/
+    animation-name: bubble;
+    animation-duration: 2.8s;
+    animation-iteration-count: infinite;
+    animation-timing-function:ease-in-out;
+  /*ANIMATION END*/
+}
+.bubble-2{
+    position: absolute;
+    height: 100%;
+    width:25%;
+    left: 25%;
+    background-color: #E0E0E0;
+    border-bottom-left-radius: 50px;
+    border-bottom-right-radius: 50px;
+  /*ANIMATION START*/
+    animation-name: bubble;
+    animation-duration: 3.2s;
+    animation-iteration-count: infinite;
+    animation-timing-function:ease-in-out;
+  /*ANIMATION END*/
+}
+.bubble-3{
+    position: absolute;
+    height: 100%;
+    width:25%;
+    right: 25%;
+    background-color: #E0E0E0;
+    border-bottom-left-radius: 50px;
+    border-bottom-right-radius: 50px;
+  /*ANIMATION START*/
+    animation-name: bubble;
+    animation-duration: 3.4s;
+    animation-iteration-count: infinite;
+    animation-timing-function:ease-in-out;
+  /*ANIMATION END*/
+}
+.bubble-4{
+    position: absolute;
+    height: 100%;
+    width:25%;
+    right: 0;
+    background-color: #E0E0E0;
+    border-bottom-left-radius: 50px;
+    border-bottom-right-radius: 50px;
+  /*ANIMATION START*/
+    animation-name: bubble;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+    animation-timing-function:ease-in-out;
+  /*ANIMATION END*/
+}
+
+/*ANIMATION START*/
+@keyframes bubble{
+    0%{
+        top: 0;
+    }
+    50%{
+        top:20%;
+    }
+     100%{
+        top: 0;
+    }
+}
+@keyframes floating{
+    0%{top: 33%;}
+    30%{top: 40%;}
+    50%{top:33%;}
+    70%{top:25%;}
+    100%{top:33%;}
+}
+/*ANIMATION END*/

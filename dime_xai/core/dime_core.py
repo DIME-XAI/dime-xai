@@ -2,13 +2,25 @@ import logging
 from typing import Optional, List, Dict, Text, Union
 
 import numpy as np
-from sklearn.metrics import f1_score, accuracy_score
+from sklearn.metrics import (
+    f1_score,
+    accuracy_score,
+)
 
-from dime_xai.shared.constants import Metrics, Smoothing, DEFAULT_RANKING_LENGTH, NLU_FALLBACK_TAG
+from dime_xai.shared.constants import (
+    Metrics,
+    Smoothing,
+    DEFAULT_RANKING_LENGTH,
+    NLU_FALLBACK_TAG,
+)
 from dime_xai.shared.explanation import DIMEExplanation
 from dime_xai.shared.exceptions.dime_core_exceptions import (
-    InvalidMetricSpecifiedException, InvalidIntentRankingException, InvalidNLUTagException, EmptyIntentRankingException,
+    InvalidMetricSpecifiedException,
+    InvalidIntentRankingException,
+    InvalidNLUTagException,
+    EmptyIntentRankingException,
 )
+from dime_xai.utils.io import series_to_json_serializable
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +53,7 @@ def get_global_accuracy_score(
     return score
 
 
-def get_confidence_score(
+def get_local_confidence_score(
         init_instance_output: Dict,
         token_instance_output: Dict,
 ) -> float:
@@ -61,8 +73,18 @@ def get_confidence_score(
         except IndexError:
             raise InvalidIntentRankingException(f"The predicted intent is not "
                                                 f"available in the intent ranking list")
-
     token_confidence_diff = init_confidence - token_confidence
+    return token_confidence_diff
+
+
+def get_global_confidence_score(
+        init_instance_output: Dict,
+        token_instance_output: Dict,
+) -> float:
+    intent_confidence = init_instance_output['intent_confidence']
+    predicted_intent_confidence = token_instance_output['intent_confidence']
+
+    token_confidence_diff = intent_confidence - predicted_intent_confidence
     return token_confidence_diff
 
 
@@ -75,6 +97,8 @@ def get_global_score(
         normalize: bool = Metrics.NORMALIZE,
 ) -> Optional[float]:
     if scorer == Metrics.F1_SCORE:
+        logger.warning("F1 Score metric is deprecated and will be removed in DIME XAI 2.0.0 "
+                       "onwards. Use Modal Confidence instead.")
         init_f1_score = get_global_f1_score(model_output=init_model_output, average=average)
         token_f1_score = get_global_f1_score(model_output=token_model_output, average=average)
 
@@ -84,6 +108,8 @@ def get_global_score(
         return token_f1_score_diff
 
     elif scorer == Metrics.ACCURACY:
+        logger.warning("Accuracy metric is deprecated and will be removed in DIME XAI 2.0.0 "
+                       "onwards. Use Modal Confidence instead.")
         init_accuracy = get_global_accuracy_score(model_output=init_model_output, normalize=normalize)
         token_accuracy = get_global_accuracy_score(model_output=token_model_output, normalize=normalize)
 
@@ -101,11 +127,10 @@ def get_global_score(
             if not token_instance:
                 raise InvalidNLUTagException(f"There is a mismatch between NLU tags")
 
-            if 'intent_ranking' not in init_instance or \
-                    'intent_ranking' not in token_instance:
-                raise EmptyIntentRankingException(f"Failed to retrieve the intent ranking")
-
-            instance_confidence_score = get_confidence_score(
+            # if 'intent_ranking' not in init_instance or \
+            #         'intent_ranking' not in token_instance:
+            #     raise EmptyIntentRankingException(f"Failed to retrieve the intent ranking")
+            instance_confidence_score = get_global_confidence_score(
                 init_instance_output=init_instance,
                 token_instance_output=token_instance,
             )
@@ -145,12 +170,14 @@ def dual_feature_importance(
                 'intent_ranking' not in token_instance_output:
             raise EmptyIntentRankingException(f"Failed to retrieve the intent ranking")
 
-        score = get_confidence_score(
+        score = get_local_confidence_score(
             init_instance_output=init_instance_output,
             token_instance_output=token_instance_output,
         )
         return score
     else:
+        logger.error("Dual Feature Importance requires Model Confidence as the metric by default. "
+                     "Accuracy and F1-Score are only supported by Global feature importance only.")
         raise InvalidMetricSpecifiedException(f"The metric must be Model Confidence"
                                               f" for Dual feature importance")
 
@@ -158,11 +185,14 @@ def dual_feature_importance(
 def softmax(
         vector: Union[List, Dict]
 ) -> Union[np.array, Dict]:
+    logger.warning("Softmax function 'softmax' is deprecated and will be removed in "
+                   "DIME XAI 2.0.0 onwards. Use 'to_probability_series' instead.")
     if isinstance(vector, Dict):
         keys = list(vector.keys())
         values = list(vector.values())
         softmax_values = softmax(vector=values)
-        return {keys[x]: softmax_values[x] for x in range(len(keys))}
+        softmax_dict = {keys[x]: softmax_values[x] for x in range(len(keys))}
+        return series_to_json_serializable(softmax_dict)
     else:
         vector_copy = vector.copy()
         vector_np = np.array(vector_copy)
@@ -172,16 +202,37 @@ def softmax(
 def exp_norm_softmax(
         vector: Union[List, Dict]
 ) -> Union[np.array, Dict]:
+    logger.warning("Normalized Exponential Softmax function 'exp_norm_softmax' is deprecated and "
+                   "will be removed in DIME XAI 2.0.0 onwards. Use 'to_probability_series' instead.")
     if isinstance(vector, Dict):
         keys = list(vector.keys())
         values = list(vector.values())
         softmax_values = softmax(vector=values)
-        return {keys[x]: softmax_values[x] for x in range(len(keys))}
+        softmax_dict = {keys[x]: softmax_values[x] for x in range(len(keys))}
+        return series_to_json_serializable(softmax_dict)
     else:
         vector_copy = vector.copy()
         vector_np = np.array(vector_copy)
         b = max(vector_np)
         return np.exp(vector_np - b) / np.exp(vector_np - b).sum()
+
+
+def clip_negative_values(
+       vector: Union[List, Dict]
+) -> Union[np.array, Dict]:
+    if isinstance(vector, Dict):
+        keys = list(vector.keys())
+        values = list(vector.values())
+        clipped_values = clip_negative_values(values)
+        clipped_series = dict(zip(keys, clipped_values))
+        return series_to_json_serializable(clipped_series)
+    else:
+        vector_copy = vector.copy()
+        vector_np = np.array(vector_copy)
+        vector_max = max(vector_np)
+        vector_max = vector_max if vector_max > 0 else 0
+        vector_np = np.clip(vector_np, a_min=0, a_max=vector_max)
+        return vector_np
 
 
 def min_max_normalize(
@@ -192,13 +243,16 @@ def min_max_normalize(
         keys = list(vector.keys())
         values = list(vector.values())
         normalized_values = min_max_normalize(vector=values, min_value=min_value)
-        return {keys[x]: normalized_values[x] for x in range(len(keys))}
+        normalized_dict = {keys[x]: normalized_values[x] for x in range(len(keys))}
+        return series_to_json_serializable(normalized_dict)
     else:
         vector_copy = vector.copy()
         vector_np = np.array(vector_copy)
         max_value = max(vector_np)
         vector_np = np.clip(vector_np, a_min=0, a_max=max_value)
-        return (vector_np - min_value) / (max_value - min_value)
+        return (vector_np - min_value) / (max_value - min_value) \
+            if (max_value - min_value) != 0 \
+            else (vector_np - min_value)
 
 
 def to_probability_series(
@@ -208,13 +262,16 @@ def to_probability_series(
         keys = list(series.keys())
         values = list(series.values())
         probabilities = to_probability_series(series=values)
-        return {keys[x]: probabilities[x] for x in range(len(keys))}
+        probabilities_dict = {keys[x]: probabilities[x] for x in range(len(keys))}
+        return series_to_json_serializable(probabilities_dict)
     else:
         series_copy = series.copy()
         series_np = np.array(series_copy)
         series_max = max(series_np)
         series_np = np.clip(series_np, a_min=0, a_max=series_max)
-        return series_np / series_np.sum()
+        return series_np / series_np.sum() \
+            if series_np.sum() != 0 \
+            else series_np
 
 
 def feature_selection(
@@ -234,11 +291,11 @@ def feature_selection(
         list(ranked_tokens.values())[0:ranking_length],
     ))
 
-    pruned_tokens = {
+    non_zero_tokens = {
         k: v for k, v in selected_tokens.items()
-        if v != 0
+        if v > 0
     }
-    return pruned_tokens
+    return non_zero_tokens
 
 
 def apply_smoothing(

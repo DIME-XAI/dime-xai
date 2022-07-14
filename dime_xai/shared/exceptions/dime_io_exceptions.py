@@ -79,3 +79,7 @@ class ModelNotFoundException(DIMEIOException):
 
 class ModelLoadException(DIMEIOException):
     pass
+
+
+class FileSizeInspectingException(DIMEIOException):
+    pass

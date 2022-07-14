@@ -1,10 +1,10 @@
 # Configuration for DIME Interfaces.
-# https://(docs link here)
+# https://dime-xai.github.io/dime-configs
 
 # Configurations that applies to both DIME CLI and Server
 # If no config is provided following are the default configurations that DIME uses.
 # Please adjust them accordingly.
-# See https://(docs link here) for more information.
+# See https://dime-xai.github.io/dime-configs for more information.
 dime_base_configs:
   - languages:
       - 'en'
@@ -18,7 +18,7 @@ dime_base_configs:
   - url_endpoint: http://localhost:5005
   - data_instance:
       - "SLIIT එකේ තියෙන උපාධි මොනවද?"
-      - "First class degree එකක් ගන්න GPA එක කොච්චර ඕනෙද"
+#      - "First class degree එකක් ගන්න GPA එක කොච්චර ඕනෙද"
   - ranking_length: 10
   - ngrams: False
     min_ngrams: 1
@@ -29,7 +29,7 @@ dime_base_configs:
 # Configurations that applies to DIME Server
 # If no config is provided following are the default configurations that DIME Server uses.
 # Please adjust them accordingly.
-# See https://(docs link here) for more information.
+# See https://dime-xai.github.io/dime-configs for more information.
 dime_server_configs:
   - host: localhost
   - port: 6066
@@ -38,6 +38,6 @@ dime_server_configs:
 # Configurations that applies to DIME CLI
 # If no config is provided following are the default configurations that DIME CLI uses.
 # Please adjust them accordingly.
-# See https://(docs link here) for more information.
+# See https://dime-xai.github.io/dime-configs for more information.
 dime_cli_configs:
   - output_mode: dual

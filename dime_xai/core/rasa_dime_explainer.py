@@ -1,5 +1,6 @@
 import logging
 import time
+from copy import deepcopy
 from time import process_time
 from typing import Text, Dict, Optional, List
 
@@ -11,6 +12,7 @@ from dime_xai.core.dime_core import (
     dual_feature_importance,
     min_max_normalize,
     to_probability_series,
+    clip_negative_values,
 )
 from dime_xai.core.dime_explainer import DIMEExplainer
 from dime_xai.shared.constants import (
@@ -40,17 +42,23 @@ from dime_xai.shared.constants import (
     MODEL_MODE_LOCAL,
     RASA_CORE_VERSION,
 )
+from dime_xai.shared.exceptions.dime_core_exceptions import (
+    InvalidMetricSpecifiedException,
+    RasaExplainerException
+)
 from dime_xai.shared.explanation import DIMEExplanation
 from dime_xai.shared.model.rasa_model import RASAModel
 from dime_xai.shared.testing_data.rasa_testing_data import RASATestingData
 from dime_xai.utils.cache import DIMECache
 from dime_xai.utils.fingerprint import Fingerprint
-from dime_xai.utils.io import get_timestamp_str, exit_dime
+from dime_xai.utils.io import get_timestamp_str
 from dime_xai.utils.text_preprocessing import (
     bag_of_words,
     remove_token_from_dataset,
     lowercase_list,
-    get_token_count, remove_token, order_dict,
+    get_token_count,
+    remove_token,
+    order_dict,
 )
 
 logger = logging.getLogger(__name__)
@@ -80,6 +88,7 @@ class RasaDIMEExplainer(DIMEExplainer):
             version_tag: Text = DEFAULT_VERSION_YAML_TAG,
             testing_data_version: Text = DEFAULT_NLU_YAML_VERSION,
             output_mode: Text = DEFAULT_OUTPUT_MODE,
+            quiet_mode: bool = False,
     ) -> None:
         super().__init__(
             models_path=models_path,
@@ -103,6 +112,7 @@ class RasaDIMEExplainer(DIMEExplainer):
             testing_data_version=testing_data_version,
             model_type=MODEL_TYPE_DIET,
             output_mode=output_mode,
+            quiet_mode=quiet_mode,
         )
         self.rasa_version = rasa_version
         self.testing_data = RASATestingData(
@@ -115,6 +125,7 @@ class RasaDIMEExplainer(DIMEExplainer):
             models_path=self.models_path,
             model_name=self.model_name,
             url=self.url,
+            quiet_mode=quiet_mode,
         )
         self.fingerprint = Fingerprint(
             model_fingerprint=self.model.get_fingerprint(),
@@ -125,12 +136,11 @@ class RasaDIMEExplainer(DIMEExplainer):
         # metric has been specified as 'confidence'
         if self.model and self.metric == Metrics.CONFIDENCE:
             if not self.model.test_diet_compatibility(intents=self.testing_data.get_intents()):
-                logger.error(f"Incompatible DIET classifier. Either use 'accuracy' "
-                             f"or 'f1-score' as the metric or attach a custom DIET "
-                             f"classifier that can output all confidence scores to use "
-                             f"confidence as the global metric. "
-                             f"http://dimedocs/custom-diet")
-                exit_dime(1)
+                logger.error(f"Incompatible DIET classifier or incomplete training data intents. "
+                             f"Either use 'accuracy' or 'f1-score' as the metric or attach a "
+                             f"custom DIET classifier that can output all confidence scores to use "
+                             f"confidence as the global metric. https://dime-xai.github.io/custom-diet")
+                raise InvalidMetricSpecifiedException()
 
         self._cache = self._init_cache()
 
@@ -185,12 +195,12 @@ class RasaDIMEExplainer(DIMEExplainer):
         gfi_start_time = time.time()
         instance_global_feature_importance = dict()
 
-        testing_data = self.testing_data.get_tagged_data()
         testing_tokens = self.testing_data.get_tokens()
         init_model_output = self.init_model_output
 
         for token in vocabulary:
             token_count = get_token_count(testing_tokens, token)
+            testing_data = self.testing_data.get_tagged_data()
 
             if token_count > 0:
                 modified_testing_data = remove_token_from_dataset(
@@ -202,6 +212,7 @@ class RasaDIMEExplainer(DIMEExplainer):
                     data_instances=modified_testing_data,
                     description=f"Global feature importance [{vocabulary.index(token) + 1}/{len(vocabulary)}]"
                 )
+
                 logger.info(f"Found {token_count} instances of the token '{token}'")
                 global_feature_importance_score = global_feature_importance(
                     init_model_output=init_model_output,
@@ -225,11 +236,20 @@ class RasaDIMEExplainer(DIMEExplainer):
         gfi_end_time = time.time()
         gfi_duration = gfi_end_time - gfi_start_time
         self._log_duration(duration=gfi_duration, title="Global")
-        return order_dict(
+        global_scores = order_dict(
             dict_to_order=instance_global_feature_importance,
             order_by_key=False,
             reverse=True
         )
+        global_scores_clipped = clip_negative_values(vector=global_scores)
+        global_normalized_scores = min_max_normalize(vector=global_scores_clipped)
+        global_probabilities = to_probability_series(series=global_scores_clipped)
+        return {
+            "global_raw_scores": global_scores,
+            "global_scores_clipped": global_scores_clipped,
+            "global_normalized_scores": global_normalized_scores,
+            "global_probabilities": global_probabilities,
+        }
 
     def _dual(self, data_instance: Text, feature_set: Dict, filter_zeros: bool) -> Optional[Dict]:
         dfi_start_time = time.time()
@@ -242,9 +262,15 @@ class RasaDIMEExplainer(DIMEExplainer):
         instance_dual_feature_importance = dict()
 
         selected_features = list(feature_set.keys())
-        tqdm_feature_set = tqdm(selected_features)
-        for token in tqdm_feature_set:
-            modified_instance = remove_token(instance=data_instance, token=token)
+
+        if not self.quiet_mode:
+            selected_features_clone = deepcopy(selected_features)
+            selected_features = tqdm(selected_features)
+        else:
+            selected_features_clone = None
+
+        for token in selected_features:
+            modified_instance = remove_token(instance=deepcopy(data_instance), token=token)
             token_instance_output = self.model.parse_unsupervised(data_instance=modified_instance)
 
             dual_feature_importance_score = dual_feature_importance(
@@ -252,8 +278,11 @@ class RasaDIMEExplainer(DIMEExplainer):
                 token_instance_output=token_instance_output,
                 scorer=Metrics.CONFIDENCE,
             )
-            tqdm_feature_set.set_description(f"Dual feature importance "
-                                             f"[{selected_features.index(token) + 1}/{len(selected_features)}]")
+            if not self.quiet_mode:
+                selected_features.set_description(
+                    f"Dual feature importance "
+                    f"[{selected_features_clone.index(token) + 1}/{len(selected_features_clone)}]"
+                )
             instance_dual_feature_importance[token] = dual_feature_importance_score
         dfi_end_time = time.time()
         dfi_duration = dfi_end_time - dfi_start_time
@@ -273,133 +302,141 @@ class RasaDIMEExplainer(DIMEExplainer):
         # present in the instance
         instance_vocab = bag_of_words(instances=instance)
         global_scores = self._global(vocabulary=instance_vocab)
+
         global_selection = feature_selection(
-            global_scores=global_scores,
+            global_scores=global_scores["global_scores_clipped"],
             ranking_length=self.ranking_length
         )
-
         if not global_selection:
             logger.warning("All features have a global feature "
                            "importance score of 0. DIME will not "
                            "be able to proceed with dual feature "
                            "importance calculation.")
-            exit_dime(1)
+            dual_scores = {}
+            dual_normalized_scores = {}
+            dual_probabilities = {}
 
-        global_normalized_scores = min_max_normalize(vector=global_selection)
-        global_probabilities = to_probability_series(series=global_selection)
+        else:
+            # Getting local feature importance for the
+            # selected tokens in the instance
+            dual_scores = self._dual(
+                data_instance=instance,
+                feature_set=global_selection,
+                filter_zeros=filter_zeros
+            )
+            if dual_scores:
+                dual_scores_clipped = clip_negative_values(vector=dual_scores['dual_importance_scores'])
+                dual_normalized_scores = min_max_normalize(vector=dual_scores_clipped)
+                dual_probabilities = to_probability_series(series=dual_scores['dual_importance_scores'])
+            else:
+                dual_normalized_scores = {}
+                dual_probabilities = {}
 
-        # Getting local feature importance for the
-        # selected tokens in the instance
-        dual_scores = self._dual(
-            data_instance=instance,
-            feature_set=global_selection,
-            filter_zeros=filter_zeros
-        )
-        dual_normalized_scores = min_max_normalize(vector=dual_scores['dual_importance_scores']) \
-            if dual_scores['dual_importance_scores'] else {}
-        dual_probabilities = to_probability_series(series=dual_scores['dual_importance_scores']) \
-            if dual_scores['dual_importance_scores'] else {}
         output_dict = {
-            'global_scores': global_scores,
+            'global_scores': global_scores["global_scores_clipped"],
             'global_selection': global_selection,
-            'global_normalized_scores': global_normalized_scores,
-            'global_probabilities': global_probabilities,
-            'dual_scores': dual_scores['dual_importance_scores'],
-            'predicted_intent': dual_scores['predicted_intent'],
-            'predicted_confidence': dual_scores['predicted_confidence'],
+            'global_normalized_scores': global_scores["global_normalized_scores"],
+            'global_probabilities': global_scores["global_probabilities"],
+            'dual_scores': dual_scores['dual_importance_scores'] if dual_scores else {},
+            'predicted_intent': dual_scores['predicted_intent'] if dual_scores else "Failed to predict due to zero "
+                                                                                    "feature selection",
+            'predicted_confidence': dual_scores['predicted_confidence'] if dual_scores else 0.0,
             'dual_normalized_scores': dual_normalized_scores,
             'dual_probabilities': dual_probabilities,
         }
         return output_dict
 
     def explain(self, persist: bool = True, inspect: bool = False) -> Optional[DIMEExplanation]:
-        explanation = dict()
-        explanation['timestamp'] = {'start': get_timestamp_str(sep="-"), 'end': 'unknown'}
+        try:
+            explanation = dict()
+            explanation['timestamp'] = {'start': get_timestamp_str(sep="-"), 'end': 'unknown'}
 
-        if self.output_mode == OUTPUT_MODE_GLOBAL:
-            logger.info(f"Calculating global feature importance "
-                        f"for all tokens in the dataset")
+            if self.output_mode == OUTPUT_MODE_GLOBAL:
+                logger.info(f"Calculating global feature importance "
+                            f"for all tokens in the dataset")
 
-            testing_vocab = self.testing_data.get_vocabulary()
-            global_scores = self._global(vocabulary=testing_vocab)
-            global_normalized_scores = min_max_normalize(vector=global_scores)
-            global_probabilities = to_probability_series(series=global_scores)
-            explanation['global'] = {
-                'feature_importance': global_scores,
-                'normalized_scores': global_normalized_scores,
-                'probability_values': global_probabilities,
-            }
+                testing_vocab = self.testing_data.get_vocabulary()
+                global_scores = self._global(vocabulary=testing_vocab)
 
-        elif self.output_mode == OUTPUT_MODE_DUAL:
-            all_dime_scores = []
-            for instance in self.data_instances:
-                logger.info(f"Calculating dual feature "
-                            f"importance for the instance: `{instance}`")
-                instance_scores = {
-                    'instance': instance,
-                    'global': {
-                        'feature_importance': {},
-                        'feature_selection': {},
-                        'normalized_scores': {},
-                        'probability_scores': {},
-                    },
-                    'dual': {
-                        'feature_importance': {},
-                        'normalized_scores': {},
-                        'probability_scores': {},
-                    }
+                explanation['global'] = {
+                    'feature_importance': global_scores["global_scores_clipped"],
+                    'normalized_scores': global_scores["global_normalized_scores"],
+                    'probability_scores': global_scores["global_probabilities"],
                 }
 
-                # Getting global and dual feature importance scores
-                # for tokens present in the instance
-                dual_output = self._instance_dual(instance=instance, filter_zeros=True)
+            elif self.output_mode == OUTPUT_MODE_DUAL:
+                all_dime_scores = []
+                for instance in self.data_instances:
+                    logger.info(f"Calculating dual feature "
+                                f"importance for the instance: `{instance}`")
+                    instance_scores = {
+                        'instance': instance,
+                        'global': {
+                            'feature_importance': {},
+                            'feature_selection': {},
+                            'normalized_scores': {},
+                            'probability_scores': {},
+                        },
+                        'dual': {
+                            'feature_importance': {},
+                            'normalized_scores': {},
+                            'probability_scores': {},
+                        }
+                    }
 
-                instance_scores['global']['feature_importance'] = dual_output['global_scores']
-                instance_scores['global']['feature_selection'] = dual_output['global_selection']
-                instance_scores['global']['normalized_scores'] = dual_output['global_normalized_scores']
-                instance_scores['global']['probability_scores'] = dual_output['global_probabilities']
-                instance_scores['global']['predicted_intent'] = dual_output['predicted_intent']
-                instance_scores['global']['predicted_confidence'] = dual_output['predicted_confidence']
-                instance_scores['dual']['feature_importance'] = dual_output['dual_scores']
-                instance_scores['dual']['normalized_scores'] = dual_output['dual_normalized_scores']
-                instance_scores['dual']['probability_scores'] = dual_output['dual_probabilities']
+                    # Getting global and dual feature importance scores
+                    # for tokens present in the instance
+                    dual_output = self._instance_dual(instance=instance, filter_zeros=True)
 
-                all_dime_scores.append(instance_scores)
-            explanation['dual'] = all_dime_scores
+                    instance_scores['global']['feature_importance'] = dual_output['global_scores']
+                    instance_scores['global']['feature_selection'] = dual_output['global_selection']
+                    instance_scores['global']['normalized_scores'] = dual_output['global_normalized_scores']
+                    instance_scores['global']['probability_scores'] = dual_output['global_probabilities']
+                    instance_scores['global']['predicted_intent'] = dual_output['predicted_intent']
+                    instance_scores['global']['predicted_confidence'] = dual_output['predicted_confidence']
+                    instance_scores['dual']['feature_importance'] = dual_output['dual_scores']
+                    instance_scores['dual']['normalized_scores'] = dual_output['dual_normalized_scores']
+                    instance_scores['dual']['probability_scores'] = dual_output['dual_probabilities']
 
-        explanation['timestamp']['end'] = get_timestamp_str(sep="-")
+                    all_dime_scores.append(instance_scores)
+                explanation['dual'] = all_dime_scores
 
-        explanation['config'] = {
-            'case_sensitive': self.case_sensitive,
-            'output_mode': self.output_mode,
-            'ranking_length': self.ranking_length if self.output_mode in [OUTPUT_MODE_DUAL] else "-",
-            'metric': self.metric if self.output_mode in [OUTPUT_MODE_GLOBAL, OUTPUT_MODE_DUAL] else "-",
-            'ngrams': {'min_ngrams': self.min_ngrams, 'max_ngrams': self.max_ngrams} if self.ngrams else "-"
-        }
-        explanation['model'] = {
-            'name': self.model_name if self.model_mode == MODEL_MODE_LOCAL else "-",
-            'type': self.model_type,
-            'version': self.rasa_version if self.model_mode == MODEL_MODE_LOCAL else "-",
-            'path': self.models_path if self.model_mode == MODEL_MODE_LOCAL else "-",
-            'mode': self.model_mode,
-            'url': self.url if self.model_mode == MODEL_MODE_REST else "-",
-            'fingerprint': (self.model.get_fingerprint() if self.model_mode == MODEL_MODE_LOCAL else "-") or "-",
-        }
-        explanation['data'] = {
-            'intents': self.testing_data.get_intent_size(),
-            'instances': self.testing_data.get_instance_size(),
-            'tokens': self.testing_data.get_token_size(),
-            'vocabulary': self.testing_data.get_vocabulary_size(),
-            'path': self.testing_data_path,
-            'fingerprint': self.testing_data.get_fingerprint() or "-",
-        }
+            explanation['timestamp']['end'] = get_timestamp_str(sep="-")
 
-        dime_explanation = DIMEExplanation(explanation=explanation)
+            explanation['config'] = {
+                'case_sensitive': self.case_sensitive,
+                'output_mode': self.output_mode,
+                'ranking_length': self.ranking_length if self.output_mode in [OUTPUT_MODE_DUAL] else "-",
+                'metric': self.metric if self.output_mode in [OUTPUT_MODE_GLOBAL, OUTPUT_MODE_DUAL] else "-",
+                'ngrams': {'min_ngrams': self.min_ngrams, 'max_ngrams': self.max_ngrams} if self.ngrams else "-"
+            }
+            explanation['model'] = {
+                'name': self.model_name if self.model_mode == MODEL_MODE_LOCAL else "-",
+                'type': self.model_type,
+                'version': self.rasa_version if self.model_mode == MODEL_MODE_LOCAL else "-",
+                'path': self.models_path if self.model_mode == MODEL_MODE_LOCAL else "-",
+                'mode': self.model_mode,
+                'url': self.url if self.model_mode == MODEL_MODE_REST else "-",
+                'fingerprint': (self.model.get_fingerprint() if self.model_mode == MODEL_MODE_LOCAL else "-") or "-",
+            }
+            explanation['data'] = {
+                'intents': self.testing_data.get_intent_size(),
+                'instances': self.testing_data.get_instance_size(),
+                'tokens': self.testing_data.get_token_size(),
+                'vocabulary': self.testing_data.get_vocabulary_size(),
+                'path': self.testing_data_path,
+                'fingerprint': self.testing_data.get_fingerprint() or "-",
+            }
+            explanation['filename'] = ""
 
-        if inspect:
-            dime_explanation.inspect()
+            dime_explanation = DIMEExplanation(explanation=explanation)
 
-        if persist:
-            dime_explanation.persist()
+            if inspect:
+                dime_explanation.inspect()
 
-        return dime_explanation
+            if persist:
+                dime_explanation.persist()
+
+            return dime_explanation
+        except Exception as e:
+            raise RasaExplainerException(e)

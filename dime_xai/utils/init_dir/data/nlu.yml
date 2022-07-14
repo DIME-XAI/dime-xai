@@ -5,16 +5,22 @@ nlu:
   examples: |
     - hey
     - hello
+    - hi
     - hello there
     - good morning
-    - good evening
-    - moin
 
 - intent: goodbye
   examples: |
+    - good afternoon
     - cu
     - good by
     - cee you later
     - good night
-    - bye
-    - goodbye
+
+- intent: mood_great
+  examples: |
+    - perfect
+    - great
+    - amazing
+    - feeling like a king
+    - wonderful

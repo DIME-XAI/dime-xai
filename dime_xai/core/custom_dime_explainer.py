@@ -54,6 +54,7 @@ class CustomDIMEExplainer(DIMEExplainer):
             version_tag: Text = DEFAULT_VERSION_YAML_TAG,
             testing_data_version: Text = DEFAULT_NLU_YAML_VERSION,
             output_mode: Text = DEFAULT_OUTPUT_MODE,
+            quiet_mode: bool = False,
     ) -> None:
         super().__init__(
             models_path=models_path,
@@ -77,6 +78,7 @@ class CustomDIMEExplainer(DIMEExplainer):
             testing_data_version=testing_data_version,
             model_type=MODEL_TYPE_OTHER,
             output_mode=output_mode,
+            quiet_mode=quiet_mode,
         )
         self.testing_data = CustomTestingData(testing_data_path)
 

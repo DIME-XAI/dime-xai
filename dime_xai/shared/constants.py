@@ -3,14 +3,15 @@ from typing import Optional, Text
 
 PACKAGE_NAME = "dime"
 PACKAGE_NAME_PIPY = "dime_xai"
-PACKAGE_VERSION = "0.0.4a6"
-PACKAGE_VERSION_LONG = f'DIME Version:{PACKAGE_VERSION}\n[Supported RASA Version:\t2.x.x]'
+PACKAGE_VERSION = "0.0.4a14"
+PACKAGE_VERSION_LONG = f'DIME Version:{PACKAGE_VERSION}\n[Supported RASA Version:\t2.8.x]'
 RASA_CORE_VERSION = "2.8.8"
 RASA_SDK_VERSION = "2.8.4"
 LANGUAGES_SUPPORTED = ['en', 'si']
 
 DEFAULT_DATA_PATH = "./data"
 FILE_READ_PERMISSION = "r"
+FILE_WRITE_PERMISSION = "w"
 FILE_ENCODING_UTF8 = "utf8"
 YAML_EXTENSIONS = [".yml", ".yaml"]
 INVALID_DIR_NAME_CHARS = ['\\', '/', '<', '>', ':', '*', '?', '|']
@@ -27,7 +28,10 @@ RASA_MODEL_EXTENSIONS = [".tar.gz"]
 RASA_288_MODEL_REGEX = r"^(\d{8})\-(\d{6}).tar.gz$"
 
 DEFAULT_DATA_INSTANCES_FILE_PATH = "./dime_data_instances.yml"
-DEFAULT_CACHE_PATH = "./.dime_cache"
+DEFAULT_CACHE_PATH = "./dime_cache"
+DEFAULT_SERVER_CACHE = "server_cache.json"
+SERVER_CACHE = "dime_server_cache.db"
+SERVER_CACHE_TABLE = "server_cache"
 
 # fingerprinting
 DEFAULT_FINGERPRINT_FILE = "dime_fingerprint.json"
@@ -41,7 +45,7 @@ DEFAULT_DATA_FINGERPRINT_PERSIST_PATH = os.path.join(DEFAULT_CACHE_PATH, DEFAULT
 DEFAULT_PERSIST_PATH = "./dime_explanations"
 DEFAULT_PERSIST_FILE = "dime_results"
 DEFAULT_PERSIST_EXTENSION = ".json"
-
+EXPLANATION_FILE_REGEX = r"^dime_results_(\d{8})\_(\d{6}).json$"
 
 DEFAULT_MODELS_PATH = "./models"
 MODEL_TYPE_DIET = "diet"
@@ -74,28 +78,30 @@ OUTPUT_MODE_DUAL = "dual"
 OUTPUT_MODE_GLOBAL = "global"
 DEFAULT_OUTPUT_MODE = OUTPUT_MODE_DUAL
 DEFAULT_RANKING_LENGTH = 10
+MAX_RANKING_LENGTH = 10
 DEFAULT_NGRAMS_MODE = False
-DEFAULT_MIN_NGRAMS = 0
-DEFAULT_MAX_NGRAMS = 4
+DEFAULT_MIN_NGRAMS = 1
+DEFAULT_MAX_NGRAMS = 2
 DEFAULT_CASE_SENSITIVE_MODE = True
 DEFAULT_DATAFRAME_MODE = False
+DEFAULT_METRIC = "confidence"
+DEFAULT_EXAMPLE_INSTANCE = "SLIIT එකේ තියෙන degrees මොනවද?"
+RANKING_LENGTH = DEFAULT_RANKING_LENGTH
 
 DEFAULT_DIME_SERVER_PORT = 6066
 DEFAULT_DIME_SERVER_LOCALHOST_DEC = "0.0.0.0"
 DEFAULT_DIME_SERVER_LOCALHOST = "localhost"
-
-DEFAULT_EXAMPLE_INSTANCE = "SLIIT විසින් පිරිනමනු ලබන IT උපාධි මොනවාද?"
-RANKING_LENGTH = 10
+BOT_URL_REGEX = r"^(https?:\/\/((localhost)|(0.0.0.0)|(127.0.0.1)):[\d]{4}([a-zA-Z\d\-\/\#\_\$\@]+)?)|(https:\/\/[a-zA-Z\d\-\/\#\_\$\@]+\.[a-zA-Z\d\-\/\#\_\$\@]+\.[a-zA-Z\d\-\/\#\_\$\@]+(:[\d]{4})?([a-zA-Z\d\-\/\#\_\$\@]+)?)$"
 
 # scaffold
 DEFAULT_INIT_SRC_DIR_NAME = "init_dir"
 DEFAULT_INIT_CACHE_DIR_NAME = ".dime_init_"
-DEFAULT_INIT_FILES_TO_EXCLUDE = ['__init__.py', '__pycache__', '__main__.py']
+DEFAULT_INIT_FILES_TO_EXCLUDE = ['__pycache__', '__main__.py']
 DEFAULT_INIT_DEST_DIR_NAME = "./"
 RASA_DIRS_IN_DIME_INIT = ["data", "models"]
 
 # dime explanations
-DEFAULT_DIME_EXPLANATION_BASE_KEYS = ['global', 'dual', 'config', 'timestamp', 'data', 'model']
+DEFAULT_DIME_EXPLANATION_BASE_KEYS = ['global', 'dual', 'config', 'timestamp', 'data', 'model', 'filename']
 DEFAULT_DIME_EXPLANATION_TIMESTAMP_KEYS = ['start', 'end']
 DEFAULT_DIME_EXPLANATION_MODEL_KEYS = ['fingerprint', 'name', 'version', 'type', 'path', 'mode', 'url']
 DEFAULT_DIME_EXPLANATION_DATA_KEYS = ['fingerprint', 'tokens', 'vocabulary', 'instances', 'intents', 'path']
@@ -108,6 +114,18 @@ DEFAULT_DIME_EXPLANATION_DUAL_SUB_GLOBAL = ['feature_importance', 'feature_selec
 DEFAULT_DIME_EXPLANATION_DUAL_SUB_DUAL = ['feature_importance', 'normalized_scores', 'probability_scores']
 DEFAULT_VISUALIZATIONS_LIMIT = 10
 
+# server process queue
+PROCESS_ID_NONE = -99
+PROCESS_QUEUE = "process_queue.db"
+PROCESS_QUEUE_TABLE = "process_queue"
+
+
+# server env
+class ServerEnv:
+    STRICT_LOCAL = "strict_local"  # triggers server explanations without subprocess
+    DEV = "dev"  # enables server debugging
+    PROD = "prod"  # disables server debugging
+
 
 class InterfaceType:
     INTERFACE_INIT = "init"
@@ -116,6 +134,33 @@ class InterfaceType:
     INTERFACE_CLI_VISUALIZER = "visualize"
     INTERFACE_SERVER = "server"
     INTERFACE_NONE = ""
+
+
+class LoggingLevel:
+    NOTSET = 0
+    DEBUG = 10
+    INFO = 20
+    WARNING = 30
+    ERROR = 40
+    CRITICAL = 50
+    QUIET = 60
+
+
+class ExplanationType:
+    JSON = "json"
+    DICT = "dict"
+    QUIET = "quiet"
+
+
+class ServerConfigType:
+    JSON = "json"
+    NONE = "none"
+
+
+class Validity:
+    VALID = "valid"
+    INVALID = "invalid"
+    NOTSET = "notset"
 
 
 class TermColor:
@@ -280,3 +325,41 @@ class Metrics:
 
 class Smoothing:
     LAPLACE = 'laplace'
+
+
+DIME_ASCII_LOGO = """
+
+                     .:*%%*:.                     
+                  |@@@@@@@@@@@#:.                 
+           .:|    |@@@#:'':#@@@@@@@#:.            
+         |@@@|    |@@@|    |@@@@@@@@@@@#:.        
+         |@@@|    |:'      |@@@| ':#@@@@@@@#:.    
+         |@@@|             |@@@|   ':@@@@@@@@@@#:.
+    .:#@@@@@@|      .:|    |@@@|    |@@@| ':#@@@@|
+.:#@@@@@@@@@@|    |@@@|    |@@@|    |@@@|   ':@@@|
+|@@@@#:' |@@@|    |@@@|    |@@@|    |@@@|    |@@@|
+|@@@|    |@@@|    |@@@|    |@@@|    |@@@|    |@@@|
+|@@@|    |@@@|    |@@@|    |@@@|    |@@@|    |@@@|
+|@@@|    |@@@|    |@@@|    |@@@|    |@@@|    |@@@|
+|@@@|    |@@@|    |@@@|    |@@@|    |@@@|    |@@@|
+|@@@|    |@@@|    |@@@|                           
+|@@@|    |@@@|    |@@@|    |@@@@@@@@@@@@@@@@@@@@@|
+|@@@|    |@@@|    |@@@|    |@@@@@@@@@@@@@@@@@@@@@|
+|@@@|    |@@@|    |@@@|    |@@@|           .:@@@@|
+|@@@|    |@@@|    |@@@|    |@@@|      .:+#@@@@@@@|
+|@@@|    |@@@|    |@@@|    |@@@|.:+#@@@@@@@@#:'
+|@@@|    |@@@|    |@@@|    |@@@@@@@@@@@#:'      .|
+|@@@#:.  |@@@|    |@@@|    |@@@@@@#+:'     .:#@@@|
+|@@@@@@:.|@@@|    |@@@|    |@@@|      .:#@@@@@@@@|
+  ':@@@@@@@@@|    |@@@|    |@@@|  .:#@@@@@@@#:'  
+      ':@@@@@|    |@@@|    |@@@|#@@@@@@@#:'      
+          ':@|    |@@@#:..:#@@@@@@@@#:'           
+                  |@@@@@@@@@@@@@#:'           XAI     
+                    ':#%@@%#:'                   
+
+"""
+
+# mongodb configs
+# push notifications
+MONGODB_PUSH_INSTANCE = 'push_notifications'
+MONGODB_PUSH_COLLECTION = 'queue'

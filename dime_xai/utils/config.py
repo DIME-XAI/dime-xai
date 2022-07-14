@@ -1,7 +1,7 @@
-from typing import Optional, Dict, Text, List
 import logging
 import os
 from collections import OrderedDict as OrderedDictColl
+from typing import Optional, Dict, Text, List
 
 from dime_xai.shared.constants import (
     DEFAULT_CONFIG_FILE_PATH,
@@ -21,7 +21,21 @@ from dime_xai.shared.constants import (
     FILE_READ_PERMISSION,
     RASA_MODEL_EXTENSIONS,
     Metrics,
-    ALLOWED_RASA_VERSIONS, YAML_EXTENSIONS, DEFAULT_DATA_INSTANCES_TAG
+    ALLOWED_RASA_VERSIONS,
+    YAML_EXTENSIONS,
+    DEFAULT_DATA_INSTANCES_TAG,
+    DEFAULT_DATA_PATH,
+    DEFAULT_MODELS_PATH,
+    RASA_CORE_VERSION,
+    RASA_CORE_URL,
+    DEFAULT_EXAMPLE_INSTANCE,
+    DEFAULT_MIN_NGRAMS,
+    DEFAULT_NGRAMS_MODE,
+    DEFAULT_CASE_SENSITIVE_MODE,
+    DEFAULT_METRIC,
+    DEFAULT_DIME_SERVER_PORT,
+    DEFAULT_DIME_SERVER_LOCALHOST,
+    MAX_RANKING_LENGTH,
 )
 from dime_xai.shared.exceptions.dime_io_exceptions import (
     DIMEConfigException,
@@ -35,6 +49,7 @@ from dime_xai.shared.exceptions.dime_io_exceptions import (
     MissingConfigPropertyException,
     InvalidPathSpecifiedException,
     InvalidURLSpecifiedException,
+    YAMLFormatException,
 )
 from dime_xai.utils.io import (
     read_yaml_file,
@@ -43,20 +58,18 @@ from dime_xai.utils.io import (
     get_latest_model_name,
     exit_dime,
 )
-from dime_xai.shared.exceptions.dime_io_exceptions import (
-    YAMLFormatException,
-)
 
 logger = logging.getLogger(__name__)
 
 
-def get_default_configs(
+def get_init_configs(
         interface: Text = None,
         server_port: Text = None,
         data_instance: Text = None,
         output_mode: Text = None,
         metric: Text = None,
         case_sensitive: Text = None,
+        quiet_mode: bool = False,
 ) -> Optional[Dict]:
     """
     Retrieves the DIME configurations provided
@@ -79,6 +92,9 @@ def get_default_configs(
             case, or else False to turn off case
             sensitivity. Replaces the default value
             provided in the dime_config.yml file
+        quiet_mode: True if required to turn all
+            unnecessary stdout or stderr outputs
+            else False
 
     Returns:
         configurations as a dictionary, or else None
@@ -222,6 +238,9 @@ def get_default_configs(
                             [key_content_dict[DIMEConfig.SUB_KEY_BASE_DATA_INSTANCE]]
 
                 valid_instances = list()
+                if not key_content_dict[DIMEConfig.SUB_KEY_BASE_DATA_INSTANCE]:
+                    raise InvalidConfigValueException(f"'data_instance' cannot be empty")
+
                 for instance in key_content_dict[DIMEConfig.SUB_KEY_BASE_DATA_INSTANCE]:
                     if instance:
                         valid_instances.append(instance)
@@ -261,6 +280,9 @@ def get_default_configs(
                             str.lower(key_content_dict[DIMEConfig.SUB_KEY_BASE_MODEL_NAME]) == 'none':
                         key_content_dict[DIMEConfig.SUB_KEY_BASE_MODEL_NAME] = DEFAULT_LATEST_TAG
 
+                    if str(key_content_dict[DIMEConfig.SUB_KEY_BASE_MODEL_NAME]).lower() == DEFAULT_LATEST_TAG:
+                        key_content_dict[DIMEConfig.SUB_KEY_BASE_MODEL_NAME] = DEFAULT_LATEST_TAG
+
                     if not isinstance(key_content_dict[DIMEConfig.SUB_KEY_BASE_MODEL_NAME], str):
                         raise InvalidDataTypeException(f"'{DIMEConfig.SUB_KEY_BASE_MODEL_NAME}' must be a String")
 
@@ -284,7 +306,7 @@ def get_default_configs(
                 else:
                     key_content_dict[DIMEConfig.SUB_KEY_BASE_MODEL_NAME] = DEFAULT_LATEST_TAG
 
-                if key_content_dict[DIMEConfig.SUB_KEY_BASE_MODEL_NAME] == DEFAULT_LATEST_TAG:
+                if str(key_content_dict[DIMEConfig.SUB_KEY_BASE_MODEL_NAME]).lower() == DEFAULT_LATEST_TAG:
                     key_content_dict[DIMEConfig.SUB_KEY_BASE_MODEL_NAME] = \
                         get_latest_model_name(models_path=key_content_dict[DIMEConfig.SUB_KEY_BASE_MODELS_PATH])
 
@@ -316,15 +338,20 @@ def get_default_configs(
                                                       f"'{MODEL_MODE_REST}' or '{MODEL_MODE_LOCAL}'")
 
                 if not isinstance(key_content_dict[DIMEConfig.SUB_KEY_BASE_RANKING_LENGTH], int):
-                    raise InvalidConfigValueException(f"'{DIMEConfig.SUB_KEY_BASE_RANKING_LENGTH}' must be an Integer")
-
-                if not 0 < key_content_dict[DIMEConfig.SUB_KEY_BASE_RANKING_LENGTH] <= DEFAULT_RANKING_LENGTH:
-                    key_content_dict[DIMEConfig.SUB_KEY_BASE_RANKING_LENGTH] = DEFAULT_RANKING_LENGTH
-                    raise InvalidConfigValueException(f"'{DIMEConfig.SUB_KEY_BASE_RANKING_LENGTH}' was set to "
-                                                      f"{DEFAULT_RANKING_LENGTH}. "
-                                                      f"'{DIMEConfig.SUB_KEY_BASE_RANKING_LENGTH}' must be a "
+                    raise InvalidConfigValueException(f"'{DIMEConfig.SUB_KEY_BASE_RANKING_LENGTH}' must be a "
                                                       f"positive Integer not greater than "
                                                       f"{DEFAULT_RANKING_LENGTH}")
+
+                if not 0 < key_content_dict[DIMEConfig.SUB_KEY_BASE_RANKING_LENGTH] <= MAX_RANKING_LENGTH:
+                    key_content_dict[DIMEConfig.SUB_KEY_BASE_RANKING_LENGTH] = DEFAULT_RANKING_LENGTH
+                    logger.warning(f"The '{DIMEConfig.SUB_KEY_BASE_RANKING_LENGTH}' was set to "
+                                   f"{DEFAULT_RANKING_LENGTH} as it exceeds the maximum length "
+                                   f"allowed which is {MAX_RANKING_LENGTH}.")
+                elif key_content_dict[DIMEConfig.SUB_KEY_BASE_RANKING_LENGTH] > DEFAULT_RANKING_LENGTH:
+                    logger.warning(f"An Integer between 1 and {DEFAULT_RANKING_LENGTH} is preferred as "
+                                   f"the '{DIMEConfig.SUB_KEY_BASE_RANKING_LENGTH}'. The higher the "
+                                   f"{DIMEConfig.SUB_KEY_BASE_RANKING_LENGTH} is, the longer it takes to "
+                                   f"generate explanations.")
 
                 if not isinstance(key_content_dict[DIMEConfig.SUB_KEY_BASE_NGRAMS], bool):
                     raise InvalidDataTypeException(f"'{DIMEConfig.SUB_KEY_BASE_NGRAMS}' must be either True or False")
@@ -431,3 +458,42 @@ def get_default_configs(
         logger.error(f"{e}")
     except DIMEConfigException or Exception as e:
         logger.error(f"{e}")
+
+
+def get_def_configs(
+) -> Dict:
+    """
+    Returns the initial DIME configurations
+
+    Returns:
+        initial configurations as a dictionary
+    """
+    default_configs = {
+        "dime_base_configs": {
+            "languages": LANGUAGES_SUPPORTED,
+            "data_path": DEFAULT_DATA_PATH,
+            "models_path": DEFAULT_MODELS_PATH,
+            "model_name": DEFAULT_LATEST_TAG,
+            "model_type": MODEL_TYPE_DIET,
+            "rasa_version": RASA_CORE_VERSION,
+            "model_mode": MODEL_MODE_LOCAL,
+            "url_endpoint": RASA_CORE_URL,
+            "data_instance": [DEFAULT_EXAMPLE_INSTANCE],
+            "ranking_length": DEFAULT_RANKING_LENGTH,
+            "ngrams": DEFAULT_NGRAMS_MODE,
+            "min_ngrams": DEFAULT_MIN_NGRAMS,
+            "max_ngrams": DEFAULT_MAX_NGRAMS,
+            "case_sensitive": DEFAULT_CASE_SENSITIVE_MODE,
+            "metric": DEFAULT_METRIC,
+        },
+        "dime_server_configs": {
+            "host": DEFAULT_DIME_SERVER_LOCALHOST,
+            "port": DEFAULT_DIME_SERVER_PORT,
+            "output_mode": OUTPUT_MODE_DUAL
+        },
+        "dime_cli_configs": {
+            "output_mode": OUTPUT_MODE_DUAL
+        }
+    }
+
+    return default_configs
