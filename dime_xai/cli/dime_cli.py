@@ -6,12 +6,13 @@ from dime_xai.core.custom_dime_explainer import CustomDIMEExplainer
 from dime_xai.core.dime_core import load_explanation
 from dime_xai.core.rasa_dime_explainer import RasaDIMEExplainer
 from dime_xai.shared.constants import (
+    ExplanationType,
+    DIMEConfig,
     MODEL_TYPE_DIET,
     MODEL_TYPE_OTHER,
-    DIMEConfig,
     MODEL_MODE_REST,
     OUTPUT_MODE_GLOBAL,
-    ExplanationType,
+    PROCESS_QUEUE,
 )
 from dime_xai.shared.exceptions.dime_base_exception import DIMEBaseException
 from dime_xai.shared.exceptions.dime_core_exceptions import (
@@ -37,7 +38,7 @@ from dime_xai.shared.exceptions.dime_io_exceptions import (
     EmptyNLUDatasetException,
     InvalidFileExtensionException,
 )
-from dime_xai.utils import process
+from dime_xai.utils import process_queue
 from dime_xai.utils.io import exit_dime
 
 logger = logging.getLogger(__name__)
@@ -110,7 +111,7 @@ class DimeCLIExplainer:
                 if self.quiet_mode:
                     explanation = rasa_dime_explainer.explain(inspect=False)
                     metadata = explanation.get_explanation(output_type=ExplanationType.QUIET)
-                    process_q = process.ProcessQueue()
+                    process_q = process_queue.ProcessQueue(data_source_path=PROCESS_QUEUE)
                     process_q.update_metadata(
                         request_id=self.request_id,
                         metadata=metadata

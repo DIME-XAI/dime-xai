@@ -18,7 +18,7 @@ from dime_xai.shared.exceptions.dime_server_exceptions import (
     DIMEBaseException,
 )
 from dime_xai.utils.io import exit_dime
-from dime_xai.utils.process import create_in_memory_process_queue
+from dime_xai.utils.process_queue import create_in_memory_process_queue
 
 logger = logging.getLogger(__name__)
 load_dotenv()

@@ -14,14 +14,15 @@ from dime_xai.server.dime_server import DIMEServer
 from dime_xai.shared.constants import (
     InterfaceType,
     TermColor,
+    Metrics,
+    LoggingLevel,
     DEFAULT_PERSIST_PATH,
     OUTPUT_MODE_GLOBAL,
     OUTPUT_MODE_DUAL,
     PACKAGE_VERSION_LONG,
-    Metrics,
-    LoggingLevel,
+    PROCESS_QUEUE,
 )
-from dime_xai.utils import process
+from dime_xai.utils import process_queue
 from dime_xai.utils.config import get_init_configs
 from dime_xai.utils.dime_logging_formatter import (
     DIMELoggingFormatter,
@@ -310,7 +311,7 @@ def run_dime_cli() -> NoReturn:
                     logger.error("Invalid Request ID received")
                     exit_dime("invalid request id error")
 
-                process_q = process.ProcessQueue()
+                process_q = process_queue.ProcessQueue(data_source_path=PROCESS_QUEUE)
                 data_instance = process_q.get_metadata(request_id=request_id)
 
             configs = get_init_configs(

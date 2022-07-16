@@ -87,7 +87,3 @@ class InvalidConfigurationTypeSpecifiedException(DIMEServerException):
 
 class CustomConfigsNotFoundException(DIMEServerException):
     pass
-
-
-class ServerConfigsPersistException(DIMEServerException):
-    pass
