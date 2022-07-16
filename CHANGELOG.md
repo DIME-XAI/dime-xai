@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/) starting with version 0.0.1a1
 
+## [1.0.0] - 2022-07-16
+### Improvements
+- optimized react js codebase for `DIME Server`
+- renamed `process` to `process_queue` and added support to specify a specific `data_source_path` to preserve the process queue
+- moved default in memory process queue to `dime_cache`
+
+### Bugfixes
+- fixed model count error after changing the active model path in `DIME Server`
+
 ## [0.0.4a14] - 2022-07-13
 ### Bugfixes
 - fixed `dime init` bug where `.dime_cache` was not properly copied to the project directory

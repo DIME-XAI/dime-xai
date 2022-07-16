@@ -21,14 +21,15 @@ from dime_xai.server.dime_api.utils.statistics import (
     explanation_statistics
 )
 from dime_xai.shared.constants import (
+    ExplanationType,
+    Validity,
+    ServerEnv,
     MODEL_TYPE_DIET,
     MODEL_TYPE_OTHER,
-    ExplanationType,
     DEFAULT_PERSIST_PATH,
     PROCESS_ID_NONE,
     ServerConfigType,
-    Validity,
-    ServerEnv,
+    PROCESS_QUEUE,
 )
 from dime_xai.shared.exceptions.dime_server_exceptions import (
     InvalidProcessIDException,
@@ -40,9 +41,9 @@ from dime_xai.shared.exceptions.dime_server_exceptions import (
     ExplanationNotFoundException,
     InvalidExplanationSpecifiedException,
 )
-from dime_xai.utils import process
+from dime_xai.utils import process_queue
 from dime_xai.utils.io import file_exists
-from dime_xai.utils.process import kill_process_tree
+from dime_xai.utils.process_queue import kill_process_tree
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +65,7 @@ def api_status():
 def explain():
     logger.debug("Explain API endpoint was called")
     request_id_for_exception_handling = None
-    process_q = process.ProcessQueue()
+    process_q = process_queue.ProcessQueue(data_source_path=PROCESS_QUEUE)
 
     try:
         request_data = request.get_json()
@@ -194,7 +195,7 @@ def abort():
 
     try:
         request_data = request.get_json()
-        process_q = process.ProcessQueue()
+        process_q = process_queue.ProcessQueue(data_source_path=PROCESS_QUEUE)
         request_id = request_data["request_id"]
 
         if not request_id:

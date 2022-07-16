@@ -112,7 +112,7 @@ POSSIBLE_TAGS = [ENTITY_ATTRIBUTE_TYPE, ENTITY_ATTRIBUTE_ROLE, ENTITY_ATTRIBUTE_
 
 
 class DIETClassifier(IntentClassifier, EntityExtractor):
-    """A multi-task model for intent classification and entity extraction.
+    """A multitask model for intent classification and entity extraction.
 
     DIET is Dual Intent and Entity Transformer.
     The architecture is based on a transformer which is shared for both tasks.
@@ -1229,6 +1229,9 @@ class DIETClassifier(IntentClassifier, EntityExtractor):
 
 
 class DIET(TransformerRasaModel):
+    def get_config(self):
+        pass
+
     def __init__(
         self,
         data_signature: Dict[Text, Dict[Text, List[FeatureSignature]]],
