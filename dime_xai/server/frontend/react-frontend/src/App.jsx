@@ -171,6 +171,7 @@ export default class App extends React.Component {
                       hideAppNotification={this.hideAppNotification}
                       scrollToTop={this.scrollToTop}
                       setActiveLink={this.setActiveLink}
+                      appSinhala={this.props.appSinhala}
                       fetchConfigs={this.fetchConfigs} />} />
                   <Route
                     path="explanations"

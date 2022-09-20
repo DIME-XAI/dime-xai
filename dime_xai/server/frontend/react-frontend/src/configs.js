@@ -1,4 +1,4 @@
-let api = ""; 
+let api = "http://localhost:6066"; 
 //"http://localhost:6066";
 
 let dimeDocsHost = "https://dime-xai.github.io";
@@ -23,6 +23,10 @@ export const configs = {
   snackbarVerticalPosition: "bottom",
   snackbarHorizontalPostion: "left",
 };
+
+export const localStorageKeys = {
+  DimeSelectedLang: "DimeSelectedLang"
+}
 
 export const dime_ascii = `
 

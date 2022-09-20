@@ -54,6 +54,7 @@ class ServerConfigs:
                 yaml_file=DEFAULT_CONFIG_FILE_PATH,
                 encoding=FILE_ENCODING_UTF8,
                 mode=FILE_READ_PERMISSION,
+                version_check=False,
             )
             self.configs_yml = yaml_content
             self.configs = json.loads(json.dumps(yaml_content, ensure_ascii=False))

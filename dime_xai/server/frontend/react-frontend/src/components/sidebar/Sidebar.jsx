@@ -42,7 +42,7 @@ class Sidebar extends React.Component {
               className={`sidebar-link ripple-button`}
               id="sidebar-dash">
               <span className="material-icons material-sidebar-icon">
-                code
+                quickreply
               </span>
               <span className="icon-text">
                 Dashboard

@@ -9,7 +9,7 @@ export default class DashboardPageBanner extends Component {
       <>
         <Box className="row row-cols-1 row-cols-lg-3" justifyContent='space-between' sx={{ marginY: 2 }}>
           <AppTile
-            containerColor=""
+            bgcolor=""
             spacing="pe-0 pe-lg-2 pb-2 pb-lg-0"
             icon="view_in_ar"
             iconColor="material-pink-f"
@@ -33,7 +33,7 @@ export default class DashboardPageBanner extends Component {
             />
 
           <AppTile
-            containerColor=""
+            bgcolor=""
             spacing="px-0 px-lg-3 py-2 py-lg-0"
             icon="psychology_alt"
             iconColor="material-steel-f"
@@ -51,7 +51,7 @@ export default class DashboardPageBanner extends Component {
             customButton="" />
 
           <AppTile
-            containerColor=""
+            bgcolor=""
             spacing="ps-0 ps-lg-2 pt-2 pt-lg-0"
             icon="quickreply"
             iconColor="material-green-f"

@@ -100,9 +100,9 @@ class DIMEInit:
             shutil.rmtree(path=self.cache_path_timestamped_path)
             os.remove(path=os.path.join("./", "__init__.py"))
 
-            logger.info("Initialized a new dime project.")
+            logger.info("Initialized a new DIME project.")
         except Exception as e:
-            logger.error(f"Initializing dime project failed. more info: {e}")
+            logger.error(f"Initializing DIME project failed. more info: {e}")
             exit_dime()
 
     def _verify_destination_dir(self, dest_path: Text = None) -> Text:
@@ -141,9 +141,9 @@ class DIMEInit:
                                 .difference(set(RASA_DIRS_IN_DIME_INIT)))
 
             if dime_overlap:
-                logger.error(f"Found overlapping DIME files and/or directories: {', '.join(dime_overlap)}")
+                logger.warning(f"Found overlapping DIME files and/or directories: {', '.join(dime_overlap)}")
                 return DestinationDirType.DIME
             elif rasa_overlap:
-                logger.error(f"Found overlapping RASA files and/or directories: {', '.join(rasa_overlap)}")
+                logger.warning(f"Found overlapping RASA files and/or directories: {', '.join(rasa_overlap)}")
                 return DestinationDirType.RASA
         return DestinationDirType.VALID

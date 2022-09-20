@@ -156,9 +156,10 @@ export default class ConfigForm extends Component {
               snackbarIsOpen: true,
               saveInProgress: false,
               previousConfigs: this.state.configs,
+            }, () => {
+              this.props.fetchConfigs();
+              this.props.fetchStats();
             });
-            this.props.fetchConfigs();
-            this.props.fetchStats("", this.state.configs.models_path);
           } else if (response.data.status === "invalid") {
             // validate
             this.setState({

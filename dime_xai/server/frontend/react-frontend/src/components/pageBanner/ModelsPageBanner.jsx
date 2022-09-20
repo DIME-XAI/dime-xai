@@ -21,7 +21,7 @@ export default class ModelsPageBanner extends Component {
       <>
         <Box className="row row-cols-1 row-cols-lg-1" sx={{ marginY: 2, marginBottom: 3 }}>
           <AppTile
-            containerColor=""
+            bgcolor=""
             align="justify-content-start"
             margin="me-0 me-lg-0"
             icon="view_in_ar"

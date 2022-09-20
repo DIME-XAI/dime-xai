@@ -288,6 +288,10 @@ def model():
                 logger.error("Specified model does not exist")
                 raise ModelNotFoundException()
 
+            if len([m for m in os.path.split(model_name) if m]) != 1 or (not model_name.endswith(".tar.gz")):
+                logger.error("Specified model is invalid")
+                raise ModelNotFoundException()
+
             os.remove(path=model_path)
             logger.debug(f"Deleted the specified model {model_name}")
 
@@ -313,6 +317,10 @@ def explanation():
 
             if not file_exists(file_path=explanation_path):
                 logger.error("Specified explanation does not exist")
+                raise ExplanationNotFoundException()
+
+            if len([f for f in os.path.split(explanation_name) if f]) != 1 or (not explanation_name.endswith(".json")):
+                logger.error("Specified explanation is invalid")
                 raise ExplanationNotFoundException()
 
             os.remove(path=explanation_path)
@@ -342,6 +350,10 @@ def explanation():
             if not explanation_name:
                 raise InvalidExplanationSpecifiedException()
 
+            if len([f for f in os.path.split(explanation_name) if f]) != 1 or (not explanation_name.endswith(".json")):
+                logger.error("Specified explanation is invalid")
+                raise InvalidExplanationSpecifiedException()
+
             logger.debug(f"Sending {explanation_name} file...")
             return send_file(
                 path_or_file=os.path.join(os.getcwd(), explanations_path, explanation_name),
@@ -349,7 +361,7 @@ def explanation():
             )
         except Exception as e:
             logger.error(f"Exception occurred while downloading the explanation. {e}")
-            return {"status": "error"}, 200
+            return {"status": "error"}, 404
 
 
 @blueprint.route("/explanation/visualize", strict_slashes=False, methods=["GET"])
