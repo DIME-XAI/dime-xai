@@ -1,4 +1,4 @@
-# DIME XAI 1.0.0 Release ⚡
+# DIME XAI 1.1.1 Release ⚡
 ```text
 DIME (Dual Interpretable Model-agnostic Explanations) is mainly aimed at Explaining DIET Classifiers in RASA 2.8.X. Models.
 ```
@@ -11,10 +11,9 @@ DIME (Dual Interpretable Model-agnostic Explanations) is mainly aimed at Explain
 - Easy to use DIME CLI
 - GUI with a dedicated server on-demand
 - Generate, Store, Download, Upload, Peak DIME explanations. Read more on [docs](https://dime-xai.github.io)
-- Supports Sinhalese unicode (Keyboard support is underway)
+- Supports Sinhalese unicode / fully Sinhala-English code-switchable
 
 ## What's Cooking? 🍪
-- Sinhalese-English code-switchable keyboard interface
 - DIME for Jupyter Notebooks
 - Stopwords List Generation
 - DIME Example Notebooks
@@ -26,5 +25,5 @@ DIME (Dual Interpretable Model-agnostic Explanations) is mainly aimed at Explain
 - Benchmark tests are in progress
 
 📒 Docs: https://dime-xai.github.io  
-📦 PyPi: https://pypi.org/project/dime-xai/1.0.0/  
-🪵 Full Changelog: Refer the relevant GitHub branch (v1.0.0) 
+📦 PyPi: https://pypi.org/project/dime-xai/1.1.1/  
+🪵 Full Changelog: Refer the relevant GitHub branch (v1.1.1) 

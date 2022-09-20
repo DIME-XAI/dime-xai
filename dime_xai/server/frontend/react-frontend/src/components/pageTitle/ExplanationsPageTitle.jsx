@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Box, Button, DialogTitle, Drawer, Stack } from '@mui/material';
+import { Box, Button, DialogTitle, Drawer, Stack, Typography } from '@mui/material';
 import UploadIcon from '@mui/icons-material/Upload';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
@@ -326,7 +326,9 @@ export default class ExplanationsPageTitle extends Component {
     return (
       <div className="row mb-1">
         <div className="col w-100 mx-0 px-0 justify-content-between d-inline-block">
-          <h4 className="float-start h-100 mt-1 dime-page-title"><strong>Dual Explanations</strong></h4>
+          <Typography variant='h6' className="float-start h-100 mt-1 dime-page-title">
+            <strong>Dual Explanations</strong>
+          </Typography>
           <Stack direction="row" spacing={1} className={"float-end"}>
             <Button variant="outlined" startIcon={<ElectricBolt />}
               sx={{ border: "none", '&:hover': { border: "none" } }}
@@ -341,7 +343,7 @@ export default class ExplanationsPageTitle extends Component {
             </Button>
             <Button variant="outlined" startIcon={<UploadIcon />}
               sx={{ border: "none", '&:hover': { border: "none" } }}
-              className="float-end app-button app-button-green mb-md-0 mb-sm-0 mx-2"
+              className="float-end app-button app-button-steel mb-md-0 mb-sm-0 mx-2"
               component="label">
               Upload
               <input

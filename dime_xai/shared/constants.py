@@ -2,8 +2,8 @@ import os.path
 from typing import Optional, Text
 
 PACKAGE_NAME = "dime"
-PACKAGE_NAME_PIPY = "dime_xai"
-PACKAGE_VERSION = "1.0.0"
+PACKAGE_NAME_PYPI = "dime_xai"
+PACKAGE_VERSION = "1.1.1"
 PACKAGE_VERSION_LONG = f'DIME Version:{PACKAGE_VERSION}\n[Supported RASA Version:\t2.8.x]'
 RASA_CORE_VERSION = "2.8.8"
 RASA_SDK_VERSION = "2.8.4"
@@ -116,7 +116,7 @@ DEFAULT_VISUALIZATIONS_LIMIT = 10
 
 # server process queue
 PROCESS_ID_NONE = -99
-PROCESS_QUEUE = f"{DEFAULT_CACHE_PATH}/process_queue.db"
+PROCESS_QUEUE = os.path.join(DEFAULT_CACHE_PATH, "process_queue.db")
 PROCESS_QUEUE_TABLE = "process_queue"
 
 

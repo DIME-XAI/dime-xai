@@ -6,14 +6,17 @@
   <meta name="viewport"
     content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link rel="stylesheet" href="%PUBLIC_URL%\res\styles\dime_styles.css">
+  <link rel="stylesheet" href="%PUBLIC_URL%\res\styles\app_styles.css">
   <link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <link href='https://fonts.googleapis.com/css?family=JetBrains Mono' rel='stylesheet'>
   <link href='https://fonts.googleapis.com/css?family=Rubik' rel='stylesheet'>
   <link href="%PUBLIC_URL%\res\styles\bootstrap.min.css" rel="stylesheet" />
   <!-- favicon -->
-  <link rel="icon" href="%PUBLIC_URL%\res\images\dime-favicon.png" type="image/png">
+  <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%\res\images\apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%\res\images\favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%\res\images\favicon-16x16.png">
+  <link rel="manifest" href="%PUBLIC_URL%\manifest.json">
   <title>DIME Server</title>
 </head>
 
@@ -23,10 +26,10 @@
     <script type="text/javascript">
       window.appTheme = "{{ config['APP_THEME'] }}";
       window.appEnv = "{{ config['APP_ENV'] }}";
+      window.appSinhala = "{{ config['SINHALA_ENABLED'] }}";
     </script>
     <script type="text/javascript" src="%PUBLIC_URL%\res\scripts\bootstrap.min.js"></script>
     <script type="text/javascript" src="%PUBLIC_URL%\res\scripts\jquery-3.6.0.min.js"></script>
-    <script type="text/javascript" src="%PUBLIC_URL%\res\scripts\jquery.parallaxify.min.js"></script>
   </div>
 </body>
 

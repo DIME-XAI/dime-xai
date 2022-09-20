@@ -2,7 +2,6 @@ import logging
 import os
 from typing import Dict
 
-from dotenv import load_dotenv
 from waitress import serve as waitress_serve
 
 from dime_xai.server import create_app
@@ -21,7 +20,6 @@ from dime_xai.utils.io import exit_dime
 from dime_xai.utils.process_queue import create_in_memory_process_queue
 
 logger = logging.getLogger(__name__)
-load_dotenv()
 
 
 class DIMEServer:
@@ -43,7 +41,7 @@ class DIMEServer:
                 "DIME": self.configs,
                 "APP_THEME": os.environ.get("APP_THEME") or "dark",
                 "APP_ENV": os.environ.get("APP_ENV") or "prod",
-                "KEYBOARD_ENABLED": os.environ.get("KEYBOARD_ENABLED") or True,
+                "SINHALA_ENABLED": os.environ.get("SINHALA_ENABLED") or True,
             }
             create_in_memory_process_queue()
 

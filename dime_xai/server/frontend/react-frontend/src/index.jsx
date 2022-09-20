@@ -10,6 +10,7 @@ root.render(
       notify={false}
       appTheme={window.appTheme.toString().toLowerCase() || "dark"}
       appEnv={window.appEnv.toString().toLowerCase() || "prod"}
+      appSinhala={Boolean(window.appSinhala) || true}
     />
   </React.StrictMode>
 );

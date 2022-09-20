@@ -29,6 +29,7 @@ from dime_xai.shared.constants import (
     RASA_288_MODEL_REGEX,
     DEFAULT_CASE_SENSITIVE_MODE,
     DEFAULT_LATEST_TAG,
+    DEFAULT_INIT_DEST_DIR_NAME,
 )
 from dime_xai.shared.exceptions.dime_io_exceptions import (
     YAMLFormatException,
@@ -149,7 +150,7 @@ def get_existing_toplevel_file_list(
 
 
 def get_dime_init_caches(
-        dir_path: Text = DEFAULT_DATA_PATH,
+        dir_path: Text = DEFAULT_INIT_DEST_DIR_NAME,
 ) -> Optional[List]:
     """
     Returns all dime cache directories in a
@@ -217,7 +218,7 @@ def file_exists(file_path: Text = None) -> bool:
     return path.exists(file_path) and path.isfile(file_path)
 
 
-def file_size(file_path: Union[Text, List], reverese: bool = False) -> Union[Dict, Tuple[float, Text]]:
+def file_size(file_path: Union[Text, List], reverse: bool = False) -> Union[Dict, Tuple[float, Text]]:
     try:
         if isinstance(file_path, Text):
             size_in_bytes = os.path.getsize(file_path)
@@ -235,7 +236,7 @@ def file_size(file_path: Union[Text, List], reverese: bool = False) -> Union[Dic
                 units = "Bytes"
             return size, units
         else:
-            if reverese:
+            if reverse:
                 file_path.reverse()
             file_sizes_dict = {file: file_size(file_path=file) for file in file_path}
             return file_sizes_dict
