@@ -7,7 +7,7 @@ from setuptools import (
 
 from dime_xai.shared.constants import (
     PACKAGE_VERSION,
-    PACKAGE_NAME_PIPY,
+    PACKAGE_NAME_PYPI,
 )
 
 logger = logging.getLogger(__name__)
@@ -33,7 +33,7 @@ except Exception as e:
                  f"package description. {e}")
 
 setup(
-    name=PACKAGE_NAME_PIPY,
+    name=PACKAGE_NAME_PYPI,
     version=PACKAGE_VERSION,
     packages=find_packages(),
     include_package_data=True,
@@ -71,12 +71,12 @@ setup(
                 "predictions in Rasa chatbot framework.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/thisisishara/dime-xai",
+    url="https://github.com/DIME-XAI/dime-xai",
     author="Ishara Dissanayake",
     author_email="thisismaduishara@gmail.com",
     license='Apache License 2.0',
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
         "Environment :: GPU",
         "Framework :: Flask",

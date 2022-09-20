@@ -2,6 +2,24 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/) starting with version 0.0.1a1
 
+## [1.1.1] - 2022-09-18
+### Improvements
+- Removed custom dir and moved dime_diet_classifier to a dir called 'dime_components' in init dir list
+- Improved favicon support and the manifest
+- UI Improvements
+
+### Bugfixes
+- removed redundant .env file loading
+- turned off version check for config file
+
+## [1.1.0] - 2022-08-11
+### Improvements
+- added Sinhala-English code-switching typing support
+
+## [1.0.1] - 2022-08-11
+### Bugfixes
+- fixed process queue initialization exception on linux-based devices
+
 ## [1.0.0] - 2022-07-16
 ### Improvements
 - optimized react js codebase for `DIME Server`
@@ -38,7 +56,7 @@ This project adheres to [Semantic Versioning](https://semver.org/) starting with
 - DIME Server allows to manage both `models` and `explanations` available on the server, locally
 - added a `In-Memory Process Queue` to allow users to `Abort` explanation generation requests made from the server
 - added support for `Rasa 2.8.8` models
-- added the ability to load c`ustom rasa pipeline components` while loading a model for explanation generation. (only available on local models)
+- added the ability to load `custom rasa pipeline components` while loading a model for explanation generation. (only available on local models)
 - added `--quiet` flag to `dime init` which creates a new DIME project from scratch without prompting for user inputs for project location verification
 
 ### Improvements
