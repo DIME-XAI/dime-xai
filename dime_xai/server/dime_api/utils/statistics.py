@@ -28,7 +28,7 @@ def model_statistics(request_data: Dict, reverse: bool) -> Optional[List]:
             in models_list
             if re.match(RASA_288_MODEL_REGEX, model_)
         ],
-        reverese=True if reverse else False,
+        reverse=True if reverse else False,
     )
     model_sizes_list = [
         {

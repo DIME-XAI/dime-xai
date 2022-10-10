@@ -8,16 +8,14 @@ import ruamel.yaml as yml
 
 from dime_xai.shared.constants import (
     DEFAULT_CONFIG_FILE_PATH,
-    FILE_ENCODING_UTF8,
-    FILE_READ_PERMISSION,
-    Validity,
-    ServerConfigType,
-)
-from dime_xai.shared.constants import (
-    DIMEConfig, MODEL_MODE_LOCAL,
+    DIMEConfig, 
+    MODEL_MODE_LOCAL,
     MODEL_MODE_REST,
     BOT_URL_REGEX,
-    FILE_WRITE_PERMISSION,
+    Validity,
+    ServerConfigType,
+    FilePermission,
+    Encoding,
 )
 from dime_xai.shared.exceptions.dime_io_exceptions import (
     ConfigFileNotFoundException,
@@ -52,8 +50,8 @@ class ServerConfigs:
         try:
             yaml_content = read_yaml_file(
                 yaml_file=DEFAULT_CONFIG_FILE_PATH,
-                encoding=FILE_ENCODING_UTF8,
-                mode=FILE_READ_PERMISSION,
+                encoding=Encoding.UTF8,
+                mode=FilePermission.READ,
                 version_check=False,
             )
             self.configs_yml = yaml_content
@@ -205,8 +203,8 @@ class ServerConfigs:
             # modifying the latest configs
             with open(
                     file=os.path.join(DEFAULT_CONFIG_FILE_PATH),
-                    encoding=FILE_ENCODING_UTF8,
-                    mode=FILE_WRITE_PERMISSION
+                    encoding=Encoding.UTF8,
+                    mode=FilePermission.WRITE
             ) as server_configs:
                 yaml = yml.YAML()
                 yaml.indent(sequence=4, offset=2)
@@ -238,6 +236,6 @@ class ServerConfigs:
                 raise CustomConfigsNotFoundException(e)
 
         if config_type == ServerConfigType.JSON:
-            return json.dumps(self.configs, indent=4, ensure_ascii=False).encode(FILE_ENCODING_UTF8).decode()
+            return json.dumps(self.configs, indent=4, ensure_ascii=False).encode(Encoding.UTF8).decode()
         else:
             return self.configs
