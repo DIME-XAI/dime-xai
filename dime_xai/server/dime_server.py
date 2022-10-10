@@ -9,6 +9,7 @@ from dime_xai.shared.constants import (
     DIMEConfig,
     DIME_ASCII_LOGO,
     ServerEnv,
+    PACKAGE_VERSION,
 )
 from dime_xai.shared.exceptions.dime_core_exceptions import DIMECoreException
 from dime_xai.shared.exceptions.dime_server_exceptions import (
@@ -42,6 +43,7 @@ class DIMEServer:
                 "APP_THEME": os.environ.get("APP_THEME") or "dark",
                 "APP_ENV": os.environ.get("APP_ENV") or "prod",
                 "SINHALA_ENABLED": os.environ.get("SINHALA_ENABLED") or True,
+                "VERSION": PACKAGE_VERSION,
             }
             create_in_memory_process_queue()
 

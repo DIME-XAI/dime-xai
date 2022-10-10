@@ -1,6 +1,6 @@
-import { Box } from '@mui/material';
-import React, { Component } from 'react';
-import AppTile from './AppTile';
+import { Box } from "@mui/material";
+import React, { Component } from "react";
+import AppTile from "./AppTile";
 
 export default class ModelsPageBanner extends Component {
   constructor(props) {
@@ -19,7 +19,10 @@ export default class ModelsPageBanner extends Component {
   render() {
     return (
       <>
-        <Box className="row row-cols-1 row-cols-lg-1" sx={{ marginY: 2, marginBottom: 3 }}>
+        <Box
+          className="row row-cols-1 row-cols-lg-1"
+          sx={{ marginY: 2, marginBottom: 3 }}
+        >
           <AppTile
             bgcolor=""
             align="justify-content-start"
@@ -33,7 +36,7 @@ export default class ModelsPageBanner extends Component {
               button: false,
             }}
             customButton=""
-            />
+          />
         </Box>
       </>
     );

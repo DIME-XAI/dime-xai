@@ -27,7 +27,8 @@ export default class ExplanationsTab extends Component {
     super(props);
     this.state = {
       dataInstanceValue: props.appConfigs.dime_base_configs.data_instance[0],
-      previousDataInstanceValue: props.appConfigs.dime_base_configs.data_instance[0],
+      previousDataInstanceValue:
+        props.appConfigs.dime_base_configs.data_instance[0],
       dataInstanceHelperText: "Invalid Data Instance",
       dataInstanceValidity: "notset",
       explainButtonInProgress: false,
@@ -36,7 +37,8 @@ export default class ExplanationsTab extends Component {
       snackbarIsOpen: false,
       snackbarMessage: "",
       snackbarType: "success",
-      selectedLanguage: localStorage.getItem(`${localStorageKeys.DimeSelectedLang}`) || "en",
+      selectedLanguage:
+        localStorage.getItem(`${localStorageKeys.DimeSelectedLang}`) || "en",
       keyboardEnabled: props.appConfigs.custom_configs.keyboard_enabled,
     };
 
@@ -51,7 +53,8 @@ export default class ExplanationsTab extends Component {
 
     // keyboard handlers
     this.handleDataInstanceChange = this.handleDataInstanceChange.bind(this);
-    this.handleDataInstanceChangeText = this.handleDataInstanceChangeText.bind(this);
+    this.handleDataInstanceChangeText =
+      this.handleDataInstanceChangeText.bind(this);
     this.handleLanguage = this.handleLanguage.bind(this);
     this.handleDataInstanceChange = this.handleDataInstanceChange.bind(this);
     this.handleInputFocus = this.handleInputFocus.bind(this);
@@ -71,16 +74,16 @@ export default class ExplanationsTab extends Component {
   }
 
   handleLanguage(language) {
-    this.setState({
-      selectedLanguage: language,
-    }, () => {
-      localStorage.setItem(
-        `${localStorageKeys.DimeSelectedLang}`,
-        language
-      )
-      this.dataInstanceRef.handleLanguage(language);
-      this.dataInstanceRef.handleInputFocus();
-    });
+    this.setState(
+      {
+        selectedLanguage: language,
+      },
+      () => {
+        localStorage.setItem(`${localStorageKeys.DimeSelectedLang}`, language);
+        this.dataInstanceRef.handleLanguage(language);
+        this.dataInstanceRef.handleInputFocus();
+      }
+    );
   }
 
   handleInputFocus(event) {
@@ -89,16 +92,16 @@ export default class ExplanationsTab extends Component {
 
   handleLangSwitch(event) {
     let language = this.state.selectedLanguage === "en" ? "si" : "en";
-    localStorage.setItem(
-      `${localStorageKeys.DimeSelectedLang}`,
-      language
-    )
-    this.setState({
-      selectedLanguage: language,
-    }, () => {
-      this.dataInstanceRef.handleLanguage(language);
-      this.dataInstanceRef.handleInputFocus();
-    });
+    localStorage.setItem(`${localStorageKeys.DimeSelectedLang}`, language);
+    this.setState(
+      {
+        selectedLanguage: language,
+      },
+      () => {
+        this.dataInstanceRef.handleLanguage(language);
+        this.dataInstanceRef.handleInputFocus();
+      }
+    );
   }
 
   handleSnackbarClose(event) {
@@ -331,22 +334,38 @@ export default class ExplanationsTab extends Component {
                     <Box className="d-flex mb-3 p-0 w-100">
                       <span
                         className="input-group-text material-icons"
-                        id="dataInstanceSpan" >
+                        id="dataInstanceSpan"
+                      >
                         chat
                       </span>
                       <KeyboardInterface
                         interface={"textfield"}
                         placeholder="Data Instance"
-                        value={this.props.appConfigs.dime_base_configs.data_instance[0]}
+                        value={
+                          this.props.appConfigs.dime_base_configs
+                            .data_instance[0]
+                        }
                         className={"w-100"}
                         disableUnderline={true}
-                        defaultLanguage={this.props.appConfigs.custom_configs.keyboard_enabled ? (localStorage.getItem(`${localStorageKeys.DimeSelectedLang}`) || "si") : "en"}
-                        ref={messageRef => this.dataInstanceRef = messageRef}
+                        defaultLanguage={
+                          this.props.appConfigs.custom_configs.keyboard_enabled
+                            ? localStorage.getItem(
+                                `${localStorageKeys.DimeSelectedLang}`
+                              ) || "si"
+                            : "en"
+                        }
+                        ref={(messageRef) =>
+                          (this.dataInstanceRef = messageRef)
+                        }
                         handleChange={this.handleDataInstanceChange}
                         handleTextChange={this.handleDataInstanceChangeText}
                         handleShortcut={this.handleLanguage}
                         handleEnter={this.handleExplain}
-                        enableShortcuts={this.props.appConfigs.custom_configs.keyboard_enabled ? true : false}
+                        enableShortcuts={
+                          this.props.appConfigs.custom_configs.keyboard_enabled
+                            ? true
+                            : false
+                        }
                         shortcutKey={81}
                         error={
                           this.state.dataInstanceValidity === "invalid"
@@ -357,7 +376,8 @@ export default class ExplanationsTab extends Component {
                           this.state.dataInstanceValidity === "invalid"
                             ? this.state.dataInstanceHelperText
                             : ""
-                        } />
+                        }
+                      />
                     </Box>
                   </Box>
                 </Box>
@@ -369,8 +389,13 @@ export default class ExplanationsTab extends Component {
                         "&.MuiToggleButton-root": { color: "black" },
                       }}
                       value="check"
-                      selected={this.state.selectedLanguage === "en" ? true : false}
-                      onChange={(e) => { this.handleLangSwitch(e) }}>
+                      selected={
+                        this.state.selectedLanguage === "en" ? true : false
+                      }
+                      onChange={(e) => {
+                        this.handleLangSwitch(e);
+                      }}
+                    >
                       <Keyboard sx={{ marginRight: "4px" }} />
                       {this.state.selectedLanguage === "en" ? "en" : "si"}
                     </ToggleButton>
@@ -390,7 +415,7 @@ export default class ExplanationsTab extends Component {
                         Explain
                       </LoadingButton>
                       {this.props.appConfigs.custom_configs.app_env ===
-                        "strict_local" ? (
+                      "strict_local" ? (
                         <Button
                           variant="outlined"
                           className="float-end app-button"
@@ -460,7 +485,10 @@ export default class ExplanationsTab extends Component {
           open={this.state.snackbarIsOpen}
           autoHideDuration={3000}
           onClose={this.handleSnackbarClose}
-          anchorOrigin={{ vertical: `${configs.snackbarVerticalPosition}`, horizontal: `${configs.snackbarHorizontalPostion}` }}
+          anchorOrigin={{
+            vertical: `${configs.snackbarVerticalPosition}`,
+            horizontal: `${configs.snackbarHorizontalPostion}`,
+          }}
         >
           <Alert
             onClose={this.handleSnackbarClose}
