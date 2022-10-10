@@ -3,7 +3,7 @@ from typing import Optional, Text
 
 PACKAGE_NAME = "dime"
 PACKAGE_NAME_PYPI = "dime_xai"
-PACKAGE_VERSION = "1.1.2"
+PACKAGE_VERSION = "1.1.3"
 PACKAGE_VERSION_LONG = f'DIME Version:{PACKAGE_VERSION}\n[Supported RASA Version:\t2.8.x]'
 RASA_CORE_VERSION = "2.8.8"
 RASA_SDK_VERSION = "2.8.4"
@@ -12,12 +12,21 @@ README_PYPI = "READMEPyPI.md"
 REQUIREMENTS = "requirements.txt"
 
 DEFAULT_DATA_PATH = "./data"
-FILE_READ_PERMISSION = "r"
-FILE_WRITE_PERMISSION = "w"
-FILE_ENCODING_UTF8 = "utf8"
 YAML_EXTENSIONS = [".yml", ".yaml"]
 INVALID_DIR_NAME_CHARS = ['\\', '/', '<', '>', ':', '*', '?', '|']
 ALLOWED_INIT_DIR_NAMES = [".", "./", "None", "none"]
+
+
+# io
+class FilePermission:
+    READ = "r"
+    WRITE = "w"
+    OVERWRITE = "w+"
+
+
+class Encoding:
+    UTF8 = "utf8"
+
 
 DEFAULT_NLU_YAML_VERSION = "2.0"
 DEFAULT_NLU_YAML_TAG = "nlu"

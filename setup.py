@@ -10,6 +10,8 @@ from dime_xai.shared.constants import (
     PACKAGE_NAME_PYPI,
     README_PYPI,
     REQUIREMENTS,
+    FilePermission,
+    Encoding
 )
 
 logger = logging.getLogger(__name__)

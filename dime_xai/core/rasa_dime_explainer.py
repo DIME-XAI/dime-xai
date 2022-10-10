@@ -22,8 +22,6 @@ from dime_xai.shared.constants import (
     DEFAULT_NLU_YAML_TAG,
     DEFAULT_VERSION_YAML_TAG,
     DEFAULT_NLU_YAML_VERSION,
-    FILE_ENCODING_UTF8,
-    FILE_READ_PERMISSION,
     DEFAULT_NLU_EXAMPLES_TAG,
     MODEL_TYPE_DIET,
     DEFAULT_MODEL_MODE,
@@ -41,6 +39,8 @@ from dime_xai.shared.constants import (
     MODEL_MODE_REST,
     MODEL_MODE_LOCAL,
     RASA_CORE_VERSION,
+    FilePermission,
+    Encoding,
 )
 from dime_xai.shared.exceptions.dime_core_exceptions import (
     InvalidMetricSpecifiedException,
@@ -80,8 +80,8 @@ class RasaDIMEExplainer(DIMEExplainer):
             min_ngrams: int = DEFAULT_MIN_NGRAMS,
             case_sensitive: bool = DEFAULT_CASE_SENSITIVE_MODE,
             metric: Text = Metrics.F1_SCORE,
-            testing_data_encoding: Text = FILE_ENCODING_UTF8,
-            testing_data_read_mode: Text = FILE_READ_PERMISSION,
+            testing_data_encoding: Text = Encoding.UTF8,
+            testing_data_read_mode: Text = FilePermission.READ,
             file_extensions: Text = YAML_EXTENSIONS,
             nlu_tag: Text = DEFAULT_NLU_YAML_TAG,
             testing_data_tag: Text = DEFAULT_NLU_EXAMPLES_TAG,
