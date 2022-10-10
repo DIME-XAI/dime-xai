@@ -17,8 +17,6 @@ from dime_xai.shared.constants import (
     OUTPUT_MODE_GLOBAL,
     LANGUAGES_SUPPORTED,
     DEFAULT_LATEST_TAG,
-    FILE_ENCODING_UTF8,
-    FILE_READ_PERMISSION,
     RASA_MODEL_EXTENSIONS,
     Metrics,
     ALLOWED_RASA_VERSIONS,
@@ -36,6 +34,8 @@ from dime_xai.shared.constants import (
     DEFAULT_DIME_SERVER_PORT,
     DEFAULT_DIME_SERVER_LOCALHOST,
     MAX_RANKING_LENGTH,
+    Encoding,
+    FilePermission,
 )
 from dime_xai.shared.exceptions.dime_io_exceptions import (
     DIMEConfigException,
@@ -121,8 +121,8 @@ def get_init_configs(
         try:
             yaml_content = read_yaml_file(
                 yaml_file=DEFAULT_CONFIG_FILE_PATH,
-                encoding=FILE_ENCODING_UTF8,
-                mode=FILE_READ_PERMISSION,
+                encoding=Encoding.UTF8,
+                mode=FilePermission.READ,
             )
         except FileNotFoundError:
             raise ConfigFileNotFoundException("Could not locate the 'dime_config.yml' file. "

@@ -23,5 +23,5 @@
 - Benchmark tests are in progress
 
 📒 Docs: https://dime-xai.github.io  
-📦 PyPi: https://pypi.org/project/dime-xai/1.1.2/  
+📦 PyPi: https://pypi.org/project/dime-xai/1.1.3/  
 🪵 Full Changelog: https://github.com/DIME-XAI/dime-xai/blob/main/CHANGELOG.md

@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/) starting with version 0.0.1a1
 
+## [1.1.3] - 2022-10-10
+### Improvements
+- redefined file io constants for source code clarity
+
+### Bugfixes
+- fixed a bug that caused errors in retrieving models due to an unexpected `reverse` argument
+
 ## [1.1.2] - 2022-10-09
 ### Improvements
 - enabled `data_source_path` argument passing in `process queue`

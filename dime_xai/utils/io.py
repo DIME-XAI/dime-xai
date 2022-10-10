@@ -20,8 +20,6 @@ from dime_xai.shared.constants import (
     DEFAULT_NLU_YAML_VERSION,
     DEFAULT_VERSION_YAML_TAG,
     YAML_EXTENSIONS,
-    FILE_READ_PERMISSION,
-    FILE_ENCODING_UTF8,
     DEFAULT_NLU_INTENT_TAG,
     DEFAULT_NLU_EXAMPLES_TAG,
     TermColor,
@@ -30,6 +28,8 @@ from dime_xai.shared.constants import (
     DEFAULT_CASE_SENSITIVE_MODE,
     DEFAULT_LATEST_TAG,
     DEFAULT_INIT_DEST_DIR_NAME,
+    Encoding,
+    FilePermission,
 )
 from dime_xai.shared.exceptions.dime_io_exceptions import (
     YAMLFormatException,
@@ -58,11 +58,13 @@ def _create_cache_dir(cache_data_dir: Text = DEFAULT_CACHE_PATH) -> bool:
     """
 
     if not cache_data_dir:
-        logger.error("Cache dir not specified. dime will use the default caching directory to store the cached files.")
+        logger.error("Cache dir not specified. dime will use the default "
+                     "caching directory to store the cached files.")
         cache_data_dir = DEFAULT_CACHE_PATH
 
     if not dir_exists(cache_data_dir):
-        logger.warning("Could not find the default caching directory. a new cache will be created.")
+        logger.warning("Could not find the default caching directory. a new "
+                       "cache will be created.")
         os.mkdir(cache_data_dir)
 
     return dir_exists(cache_data_dir)
@@ -269,8 +271,8 @@ def is_bot_root() -> bool:
 
 def read_yaml_file(
         yaml_file: Text = None,
-        encoding: Text = FILE_ENCODING_UTF8,
-        mode: Text = FILE_READ_PERMISSION,
+        encoding: Text = Encoding.UTF8,
+        mode: Text = FilePermission.READ,
         yaml_version: Text = DEFAULT_NLU_YAML_VERSION,
         version_check: bool = True,
 ) -> Optional[OrderedDict]:
