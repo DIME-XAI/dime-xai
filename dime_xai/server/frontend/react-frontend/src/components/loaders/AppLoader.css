@@ -1,35 +1,34 @@
 .app-config-loader {
+  background-color: #212121;
+  animation-name: app-config-loader-color;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  text-align: center;
+}
+
+@keyframes app-config-loader-color {
+  0% {
     background-color: #212121;
-    animation-name: app-config-loader-color;
-    animation-duration: 2s;
-    animation-iteration-count: infinite;
-    text-align: center;
   }
-  
-  @keyframes app-config-loader-color {
-    0% {
-      background-color: #212121;
-    }
-    50% {
-      background-color: #252f33;
-    }
-    100% {
-      background-color: #212121;
-    }
+  50% {
+    background-color: #252f33;
   }
-  
-  .app-config-loader-logo {
-    height: 20vmin;
-    pointer-events: none;
+  100% {
+    background-color: #212121;
   }
-  
-  .app-config-loader-header {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
-  }
-  
+}
+
+.app-config-loader-logo {
+  height: 20vmin;
+  pointer-events: none;
+}
+
+.app-config-loader-header {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}

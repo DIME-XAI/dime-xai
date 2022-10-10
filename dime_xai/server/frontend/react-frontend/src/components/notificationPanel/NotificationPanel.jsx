@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { Component } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default class NotificationPanel extends Component {
   constructor(props) {
@@ -12,7 +12,7 @@ export default class NotificationPanel extends Component {
   }
 
   componentDidMount() {
-    const height = document.getElementById('header-notification').clientHeight;
+    const height = document.getElementById("header-notification").clientHeight;
     this.setState({ height });
   }
 
@@ -20,15 +20,28 @@ export default class NotificationPanel extends Component {
     return (
       <>
         <AnimatePresence>
-          <motion.div className="app-notification" id="header-notification"
+          <motion.div
+            className="app-notification"
+            id="header-notification"
             key="header-notification"
             initial={{ y: -100 }}
             animate={{ y: 0 }}
-            exit={{ y: -100 }}>
+            exit={{ y: -100 }}
+          >
             <div className="app-notification-header">
-              <h5 className="app-notification-title" id="header-notification-title">{this.props.notifyTitle}</h5>
-              <button type="button" className="btn-close btn-close-white" onClick={this.handleClose} aria-label="Close" id="header-notification-close">
-              </button>
+              <h5
+                className="app-notification-title"
+                id="header-notification-title"
+              >
+                {this.props.notifyTitle}
+              </h5>
+              <button
+                type="button"
+                className="btn-close btn-close-white"
+                onClick={this.handleClose}
+                aria-label="Close"
+                id="header-notification-close"
+              ></button>
             </div>
             <div className="app-notification-body scroll-hidden">
               <div className="row align-items-md-stretch">

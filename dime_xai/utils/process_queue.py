@@ -21,9 +21,9 @@ from dime_xai.shared.exceptions.dime_server_exceptions import (
 logger = logging.getLogger(__name__)
 
 
-def create_in_memory_process_queue() -> NoReturn:
+def create_in_memory_process_queue(data_source_path: Text = PROCESS_QUEUE) -> NoReturn:
     try:
-        with sqlite3.connect(PROCESS_QUEUE) as conn:
+        with sqlite3.connect(data_source_path) as conn:
             conn.execute(f'DROP TABLE IF EXISTS {PROCESS_QUEUE_TABLE};')
             conn.execute(f'CREATE TABLE {PROCESS_QUEUE_TABLE} '
                          f'(request_id TEXT PRIMARY KEY, '

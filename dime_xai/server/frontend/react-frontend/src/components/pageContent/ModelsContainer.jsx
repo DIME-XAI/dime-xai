@@ -1,6 +1,6 @@
-import { Box } from '@mui/material';
-import React, { Component } from 'react';
-import ModelList from './ModelList';
+import { Box } from "@mui/material";
+import React, { Component } from "react";
+import ModelList from "./ModelList";
 
 export default class ModelsContainer extends Component {
   render() {

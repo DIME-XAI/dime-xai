@@ -8,6 +8,8 @@ from setuptools import (
 from dime_xai.shared.constants import (
     PACKAGE_VERSION,
     PACKAGE_NAME_PYPI,
+    README_PYPI,
+    REQUIREMENTS,
 )
 
 logger = logging.getLogger(__name__)
@@ -20,10 +22,18 @@ requirements = None
 long_description = None
 
 try:
-    with open("README.md", mode="r", encoding="utf8") as readme_file:
+    with open(
+            README_PYPI,
+            mode=FilePermission.READ,
+            encoding=Encoding.UTF8
+    ) as readme_file:
         long_description = readme_file.read()
 
-    with open("requirements.txt", mode="r", encoding="utf8") as requirements_file:
+    with open(
+            REQUIREMENTS,
+            mode=FilePermission.READ,
+            encoding=Encoding.UTF8
+    ) as requirements_file:
         requirements = requirements_file.readlines()
     requirements = [str.strip(req) for req in requirements]
 
@@ -90,27 +100,24 @@ setup(
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
     install_requires=requirements or [
-        'rasa~=2.8.8',
-        'rasa-sdk<3.0.0,>=2.8.1',
-        'requests<3.0,>=2.23',
-        'ruamel.yaml<0.17.0,>=0.16.5',
-        'numpy<1.19,>=1.16',
-        'setuptools>=41.0.0',
-        'scipy<2.0.0,>=1.4.1',
-        'regex<2021.8,>=2020.6',
-        'tensorflow<2.4,>=2.3.4',
-        'scikit-learn<0.25,>=0.22',
-        'pymongo<3.11,>=3.8',
-        'tqdm<5.0,>=4.31',
-        'pandas<=1.4.3,>=1.3.5',
-        'gensim~=4.1.2',
-        'flask~=2.1.2',
-        'werkzeug~=2.1.2',
-        'termgraph~=0.5.3',
-        'flask-cors~=3.0.10',
-        'waitress~=2.1.2',
-        'python-dotenv~=0.20.0',
-        'psutil~=5.9.1',
+        "rasa~=2.8.8",
+        "requests<3.0,>=2.23",
+        "ruamel.yaml<0.17.0,>=0.16.5",
+        "numpy<1.19,>=1.16",
+        "setuptools>=41.0.0",
+        "scipy<2.0.0,>=1.4.1",
+        "regex<2021.8,>=2020.6",
+        "tensorflow<2.4,>=2.3.4",
+        "scikit-learn<0.25,>=0.22",
+        "tqdm<5.0,>=4.31",
+        "pandas<=1.4.3,>=1.3.5",
+        "gensim~=4.1.2",
+        "flask~=2.1.2",
+        "termgraph~=0.5.3",
+        "flask-cors~=3.0.10",
+        "waitress~=2.1.2",
+        "python-dotenv~=0.20.0",
+        "psutil~=5.9.1",
     ],
     entry_points={'console_scripts': ['dime = dime_xai.dime_xai:run_dime_cli']}
 )

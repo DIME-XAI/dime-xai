@@ -1,5 +1,3 @@
-# DIME XAI 1.1.2 Release ⚡
-
 ### DIME (Dual Interpretable Model-agnostic Explanations) is mainly aimed at Explaining DIET Classifiers in RASA 2.8.X. Models.
 
 ## Features 🦄

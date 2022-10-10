@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
-import ModelsPageTitle from '../../components/pageTitle/ModelsPageTitle';
-import ModelsPageBanner from '../../components/pageBanner/ModelsPageBanner';
-import ModelsContainer from '../../components/pageContent/ModelsContainer';
+import React, { Component } from "react";
+import ModelsPageTitle from "../../components/pageTitle/ModelsPageTitle";
+import ModelsPageBanner from "../../components/pageBanner/ModelsPageBanner";
+import ModelsContainer from "../../components/pageContent/ModelsContainer";
 
 export default class Models extends Component {
   componentDidMount() {
@@ -10,8 +10,7 @@ export default class Models extends Component {
 
   render() {
     return (
-      <div
-        className="app-main">
+      <div className="app-main">
         <div className="main-section m-0 p-0" id="main-section-dashboard">
           <ModelsPageTitle />
           <ModelsPageBanner />
@@ -19,7 +18,8 @@ export default class Models extends Component {
             appConfigs={this.props.appConfigs}
             showAppNotification={this.props.showAppNotification}
             hideAppNotification={this.props.hideAppNotification}
-            scrollToTop={this.props.scrollToTop} />
+            scrollToTop={this.props.scrollToTop}
+          />
         </div>
       </div>
     );
