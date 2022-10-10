@@ -1,8 +1,14 @@
-import React from 'react';
-import ExplanationBar from './ExplanationBar';
-import { Accordion, AccordionDetails, AccordionSummary, Box, Typography } from '@mui/material';
-import { ExpandMore } from '@mui/icons-material';
-import TwoColDataTable from '../dataTable/TwoColDataTable';
+import React from "react";
+import ExplanationBar from "./ExplanationBar";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Typography,
+} from "@mui/material";
+import { ExpandMore } from "@mui/icons-material";
+import TwoColDataTable from "../dataTable/TwoColDataTable";
 
 class DualExplanation extends React.Component {
   constructor(props) {
@@ -15,20 +21,30 @@ class DualExplanation extends React.Component {
   }
 
   render() {
-    let dualScores = Object.keys(this.state.data.dual[0].dual.probability_scores).map((key, index) =>
+    let dualScores = Object.keys(
+      this.state.data.dual[0].dual.probability_scores
+    ).map((key, index) => (
       <ExplanationBar
         key={key}
-        sliderValue={Number((Number(this.state.data.dual[0].dual.probability_scores[key]) * 100).toFixed(2)).toString() + "%"}
+        sliderValue={
+          Number(
+            (
+              Number(this.state.data.dual[0].dual.probability_scores[key]) * 100
+            ).toFixed(2)
+          ).toString() + "%"
+        }
         token={key.toString()}
-        color={this.state.color} />
-    );
+        color={this.state.color}
+      />
+    ));
     return (
       <Box className="mb-5">
         <Typography
           variant="h6"
           gutterBottom
           component="div"
-          sx={{ fontWeight: 'medium' }} >
+          sx={{ fontWeight: "medium" }}
+        >
           Dual Feature Importance
         </Typography>
         <Box className="mb-4">
@@ -40,7 +56,11 @@ class DualExplanation extends React.Component {
               </tr>
               <tr>
                 <td>Predicted Intent</td>
-                <td><kbd className="fs-6 kbd material-orange">{this.props.data.dual[0].global.predicted_intent}</kbd></td>
+                <td>
+                  <kbd className="fs-6 kbd material-orange">
+                    {this.props.data.dual[0].global.predicted_intent}
+                  </kbd>
+                </td>
               </tr>
               <tr>
                 <td>Predicted DIET Confidene</td>
@@ -49,9 +69,7 @@ class DualExplanation extends React.Component {
             </tbody>
           </table>
         </Box>
-        <Box className="mb-4">
-          {dualScores}
-        </Box>
+        <Box className="mb-4">{dualScores}</Box>
         <Box className="">
           <Accordion className="explanation-accordian explanation-accordian-dual">
             <AccordionSummary
@@ -64,7 +82,8 @@ class DualExplanation extends React.Component {
             <AccordionDetails>
               <TwoColDataTable
                 data={this.props.data.dual[0].dual.feature_importance}
-                classNames="app-table-dual" />
+                classNames="app-table-dual"
+              />
             </AccordionDetails>
           </Accordion>
         </Box>

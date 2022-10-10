@@ -1,33 +1,32 @@
-import React, { Component } from 'react';
-import { DialogTitle, Divider, Drawer, List } from '@mui/material';
-import axios, { CanceledError } from 'axios';
-import { configs } from '../../configs';
-import ExplanationDetails from '../explanation/ExplanationDetails';
-import GlobalExplanation from '../explanation/GlobalExplanation';
-import DualExplanation from '../explanation/DualExplanation';
-import { Box } from '@mui/system';
-import ExplanationPaginator from './ExplanationPaginator';
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
+import React, { Component } from "react";
+import { DialogTitle, Divider, Drawer, List } from "@mui/material";
+import axios, { CanceledError } from "axios";
+import { configs } from "../../configs";
+import ExplanationDetails from "../explanation/ExplanationDetails";
+import GlobalExplanation from "../explanation/GlobalExplanation";
+import DualExplanation from "../explanation/DualExplanation";
+import { Box } from "@mui/system";
+import ExplanationPaginator from "./ExplanationPaginator";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 
-
-const Alert = React.forwardRef((props, ref) =>
+const Alert = React.forwardRef((props, ref) => (
   <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
-);
+));
 
 export default class ExplanationList extends Component {
   constructor(props) {
     super(props);
     this.state = {
       snackbarIsOpen: false,
-      snackbarMessage: '',
+      snackbarMessage: "",
       snackbarType: "success",
       deleteInProgress: false,
       visualizeInProgress: false,
       downloadInProgress: false,
       activeExplanation: undefined,
       activeVisualization: undefined,
-      drawerIsOpen: false
+      drawerIsOpen: false,
     };
 
     this.handleDelete = this.handleDelete.bind(this);
@@ -55,10 +54,13 @@ export default class ExplanationList extends Component {
     try {
       explanationName = explanationName.toString();
       explanationName = explanationName.replace(".json", "");
-      explanationName = explanationName.replace(/[#_~`@$%^&*()\-+=/\\. ,?"':;]/g, "");
+      explanationName = explanationName.replace(
+        /[#_~`@$%^&*()\-+=/\\. ,?"':;]/g,
+        ""
+      );
       return `expid${explanationName}`;
     } catch (err) {
-      console.log("Exception occurred while generating Modal ID")
+      console.log("Exception occurred while generating Modal ID");
       return "";
     }
   }
@@ -79,7 +81,7 @@ export default class ExplanationList extends Component {
 
       return `${year}.${month}.${date} ${hour}-${minute}-${second}`;
     } catch (err) {
-      console.log("Exception occurred while generating date")
+      console.log("Exception occurred while generating date");
       return "";
     }
   }
@@ -96,76 +98,80 @@ export default class ExplanationList extends Component {
     this.props.hideAppNotification();
     this.setState({
       downloadInProgress: true,
-      activeExplanation: explanation
+      activeExplanation: explanation,
     });
-    console.log('download was called ' + explanation);
+    console.log("download was called " + explanation);
 
     let config = {
-      responseType: 'blob',
+      responseType: "blob",
       params: {
-        explanation_name: explanation
-      }
+        explanation_name: explanation,
+      },
     };
-    axios.get(configs.explanationEndpoint, config)
-      .then(function (response) {
-        console.log(response);
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', `${explanation}`);
-        document.body.appendChild(link);
-        link.click();
+    axios
+      .get(configs.explanationEndpoint, config)
+      .then(
+        function (response) {
+          console.log(response);
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", `${explanation}`);
+          document.body.appendChild(link);
+          link.click();
 
-        this.setState({
-          snackbarMessage: "Explanation downloaded successfully!",
-          snackbarType: "success",
-          snackbarIsOpen: true,
-          downloadInProgress: false,
-          activeExplanation: undefined,
-        });
+          this.setState({
+            snackbarMessage: "Explanation downloaded successfully!",
+            snackbarType: "success",
+            snackbarIsOpen: true,
+            downloadInProgress: false,
+            activeExplanation: undefined,
+          });
+        }.bind(this)
+      )
+      .catch(
+        function (error) {
+          console.log(error);
+          let notifyTitle = "Explanation Error";
+          let notifyBody = `An unknown error occurred while attempting to download the explanation specified (${explanation}). Please try again a bit later.`;
+          let snackbarMessage =
+            "An unknown error occurred while downloading the explanation";
+          let snackbarType = "error";
 
-      }.bind(this))
-      .catch(function (error) {
-        console.log(error);
-        let notifyTitle = "Explanation Error";
-        let notifyBody = `An unknown error occurred while attempting to download the explanation specified (${explanation}). Please try again a bit later.`;
-        let snackbarMessage = "An unknown error occurred while downloading the explanation";
-        let snackbarType = "error";
+          if (error instanceof CanceledError) {
+            notifyBody = "Explanation Download Request Aborted!";
+            snackbarMessage = notifyBody;
+            snackbarType = "warning";
+          } else if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            notifyBody = "Failed to obtain a valid explanation status";
+            snackbarMessage = notifyBody;
+          } else if (error.request) {
+            // The request was made but no response was received
+            console.log(error.request);
+            notifyBody = "Server did not respond";
+            snackbarMessage = notifyBody;
+          } else {
+            // Something happened in setting up the request that triggered an Error
+            console.log("Error:", error.message);
+            notifyBody = "Explanation download request failed";
+            snackbarMessage = notifyBody;
+          }
+          console.log(error.config);
 
-        if (error instanceof CanceledError) {
-          notifyBody = "Explanation Download Request Aborted!";
-          snackbarMessage = notifyBody;
-          snackbarType = "warning";
-        } else if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          notifyBody = "Failed to obtain a valid explanation status";
-          snackbarMessage = notifyBody;
-        } else if (error.request) {
-          // The request was made but no response was received
-          console.log(error.request);
-          notifyBody = "Server did not respond";
-          snackbarMessage = notifyBody;
-        } else {
-          // Something happened in setting up the request that triggered an Error
-          console.log('Error:', error.message);
-          notifyBody = "Explanation download request failed";
-          snackbarMessage = notifyBody;
-        }
-        console.log(error.config);
+          this.setState({
+            snackbarMessage: snackbarMessage,
+            snackbarType: snackbarType,
+            snackbarIsOpen: true,
+            downloadInProgress: false,
+            activeExplanation: undefined,
+          });
 
-        this.setState({
-          snackbarMessage: snackbarMessage,
-          snackbarType: snackbarType,
-          snackbarIsOpen: true,
-          downloadInProgress: false,
-          activeExplanation: undefined,
-        });
-
-        this.props.scrollToTop();
-        this.props.showAppNotification(notifyTitle, notifyBody);
-
-      }.bind(this));
+          this.props.scrollToTop();
+          this.props.showAppNotification(notifyTitle, notifyBody);
+        }.bind(this)
+      );
   }
 
   handleVisualize(event, explanation) {
@@ -173,82 +179,84 @@ export default class ExplanationList extends Component {
     this.setState({
       activeExplanation: explanation,
       visualizeInProgress: true,
-      activeVisualization: undefined
+      activeVisualization: undefined,
     });
-    console.log('download was called ' + explanation);
+    console.log("download was called " + explanation);
 
     let config = {
-      responseType: 'json',
+      responseType: "json",
       params: {
-        explanation_name: explanation
-      }
+        explanation_name: explanation,
+      },
     };
-    axios.get(configs.visualizationEndpoint, config)
-      .then(function (response) {
-        console.log(response);
-        if (response.data.status !== undefined) {
-          if (response.data.status === "success") {
-            this.setState({
-              snackbarMessage: "Visualization data received!",
-              snackbarType: "success",
-              snackbarIsOpen: true,
-              visualizeInProgress: false,
-              activeVisualization: JSON.parse(response.data.explanation),
-              activeExplanation: undefined,
-            });
-            this.setState({ drawerIsOpen: true });
-
+    axios
+      .get(configs.visualizationEndpoint, config)
+      .then(
+        function (response) {
+          console.log(response);
+          if (response.data.status !== undefined) {
+            if (response.data.status === "success") {
+              this.setState({
+                snackbarMessage: "Visualization data received!",
+                snackbarType: "success",
+                snackbarIsOpen: true,
+                visualizeInProgress: false,
+                activeVisualization: JSON.parse(response.data.explanation),
+                activeExplanation: undefined,
+              });
+              this.setState({ drawerIsOpen: true });
+            } else {
+              throw new Error("Unexpected error");
+            }
           } else {
-            throw new Error("Unexpected error");
+            throw new Error("Unexpected response");
           }
+        }.bind(this)
+      )
+      .catch(
+        function (error) {
+          console.log(error);
+          let notifyTitle = "Explanation Error";
+          let notifyBody = `An unknown error occurred while attempting to visualize the explanation specified (${explanation}). Please try again a bit later.`;
+          let snackbarMessage =
+            "An unknown error occurred while visualizing the explanation";
+          let snackbarType = "error";
 
-        } else {
-          throw new Error("Unexpected response");
-        }
+          if (error instanceof CanceledError) {
+            notifyBody = "Visualization Request Aborted!";
+            snackbarMessage = notifyBody;
+            snackbarType = "warning";
+          } else if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            notifyBody = "Failed to obtain a valid visualization status";
+            snackbarMessage = notifyBody;
+          } else if (error.request) {
+            // The request was made but no response was received
+            console.log(error.request);
+            notifyBody = "Server did not respond";
+            snackbarMessage = notifyBody;
+          } else {
+            // Something happened in setting up the request that triggered an Error
+            console.log("Error:", error.message);
+            notifyBody = "Visualization request failed";
+            snackbarMessage = notifyBody;
+          }
+          console.log(error.config);
 
-      }.bind(this))
-      .catch(function (error) {
-        console.log(error);
-        let notifyTitle = "Explanation Error";
-        let notifyBody = `An unknown error occurred while attempting to visualize the explanation specified (${explanation}). Please try again a bit later.`;
-        let snackbarMessage = "An unknown error occurred while visualizing the explanation";
-        let snackbarType = "error";
+          this.setState({
+            snackbarMessage: snackbarMessage,
+            snackbarType: snackbarType,
+            snackbarIsOpen: true,
+            visualizeInProgress: false,
+            activeExplanation: undefined,
+            activeVisualization: undefined,
+          });
 
-        if (error instanceof CanceledError) {
-          notifyBody = "Visualization Request Aborted!";
-          snackbarMessage = notifyBody;
-          snackbarType = "warning";
-        } else if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          notifyBody = "Failed to obtain a valid visualization status";
-          snackbarMessage = notifyBody;
-        } else if (error.request) {
-          // The request was made but no response was received
-          console.log(error.request);
-          notifyBody = "Server did not respond";
-          snackbarMessage = notifyBody;
-        } else {
-          // Something happened in setting up the request that triggered an Error
-          console.log('Error:', error.message);
-          notifyBody = "Visualization request failed";
-          snackbarMessage = notifyBody;
-        }
-        console.log(error.config);
-
-        this.setState({
-          snackbarMessage: snackbarMessage,
-          snackbarType: snackbarType,
-          snackbarIsOpen: true,
-          visualizeInProgress: false,
-          activeExplanation: undefined,
-          activeVisualization: undefined,
-        });
-
-        this.props.scrollToTop();
-        this.props.showAppNotification(notifyTitle, notifyBody);
-
-      }.bind(this));
+          this.props.scrollToTop();
+          this.props.showAppNotification(notifyTitle, notifyBody);
+        }.bind(this)
+      );
   }
 
   handleDelete(event, explanation) {
@@ -257,94 +265,94 @@ export default class ExplanationList extends Component {
       deleteInProgress: true,
       activeExplanation: explanation,
     });
-    console.log('delete called ' + explanation);
+    console.log("delete called " + explanation);
 
     let payload = {
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
       data: {
-        explanation_name: explanation
-      }
+        explanation_name: explanation,
+      },
     };
-    axios.delete(configs.explanationEndpoint, payload)
-      .then(function (response) {
-        console.log(response);
-        if (response.data.status !== undefined) {
-          if (response.data.status === "success") {
-            this.setState({
-              snackbarMessage: "Explanation deleted successfully!",
-              snackbarType: "success",
-              snackbarIsOpen: true,
-              deleteInProgress: false,
-              activeExplanation: undefined,
-            });
-            this.props.fetchExplanations();
-
+    axios
+      .delete(configs.explanationEndpoint, payload)
+      .then(
+        function (response) {
+          console.log(response);
+          if (response.data.status !== undefined) {
+            if (response.data.status === "success") {
+              this.setState({
+                snackbarMessage: "Explanation deleted successfully!",
+                snackbarType: "success",
+                snackbarIsOpen: true,
+                deleteInProgress: false,
+                activeExplanation: undefined,
+              });
+              this.props.fetchExplanations();
+            } else {
+              throw new Error("Unexpected error");
+            }
           } else {
-            throw new Error("Unexpected error");
+            throw new Error("Unexpected response");
           }
+        }.bind(this)
+      )
+      .catch(
+        function (error) {
+          console.log(error);
+          let notifyTitle = "Explanation Error";
+          let notifyBody = `An unknown error occurred while attempting to delete the explanation specified (${explanation}). Please try again a bit later.`;
+          let snackbarMessage =
+            "An unknown error occurred while deleting the explanation";
+          let snackbarType = "error";
 
-        } else {
-          throw new Error("Unexpected response");
-        }
-      }.bind(this))
-      .catch(function (error) {
-        console.log(error);
-        let notifyTitle = "Explanation Error";
-        let notifyBody = `An unknown error occurred while attempting to delete the explanation specified (${explanation}). Please try again a bit later.`;
-        let snackbarMessage = "An unknown error occurred while deleting the explanation";
-        let snackbarType = "error";
+          if (error instanceof CanceledError) {
+            notifyBody = "Explanation Delete Request Aborted!";
+            snackbarMessage = notifyBody;
+            snackbarType = "warning";
+          } else if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            notifyBody = "Failed to obtain a valid explanation status";
+            snackbarMessage = notifyBody;
+          } else if (error.request) {
+            // The request was made but no response was received
+            console.log(error.request);
+            notifyBody = "Server did not respond";
+            snackbarMessage = notifyBody;
+          } else {
+            // Something happened in setting up the request that triggered an Error
+            console.log("Error:", error.message);
+            notifyBody = "Explanation delete request failed";
+            snackbarMessage = notifyBody;
+          }
+          console.log(error.config);
 
-        if (error instanceof CanceledError) {
-          notifyBody = "Explanation Delete Request Aborted!";
-          snackbarMessage = notifyBody;
-          snackbarType = "warning";
-        } else if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          notifyBody = "Failed to obtain a valid explanation status";
-          snackbarMessage = notifyBody;
-        } else if (error.request) {
-          // The request was made but no response was received
-          console.log(error.request);
-          notifyBody = "Server did not respond";
-          snackbarMessage = notifyBody;
-        } else {
-          // Something happened in setting up the request that triggered an Error
-          console.log('Error:', error.message);
-          notifyBody = "Explanation delete request failed";
-          snackbarMessage = notifyBody;
-        }
-        console.log(error.config);
+          this.setState({
+            snackbarMessage: snackbarMessage,
+            snackbarType: snackbarType,
+            snackbarIsOpen: true,
+            deleteInProgress: false,
+            activeExplanation: undefined,
+          });
 
-        this.setState({
-          snackbarMessage: snackbarMessage,
-          snackbarType: snackbarType,
-          snackbarIsOpen: true,
-          deleteInProgress: false,
-          activeExplanation: undefined,
-        });
-
-        this.props.scrollToTop();
-        this.props.showAppNotification(notifyTitle, notifyBody);
-
-      }.bind(this));
+          this.props.scrollToTop();
+          this.props.showAppNotification(notifyTitle, notifyBody);
+        }.bind(this)
+      );
   }
 
   render() {
     return (
       <>
-        <List
-          sx={{ width: '100%' }}
-          className="app-model-list"
-          component="nav">
-          <Divider component="li" variant='fullWidth' />
-          {this.props.explanationList === undefined ?
-            <div className='p-3'>
+        <List sx={{ width: "100%" }} className="app-model-list" component="nav">
+          <Divider component="li" variant="fullWidth" />
+          {this.props.explanationList === undefined ? (
+            <div className="p-3">
               Currently there are no Explanations Available
             </div>
-            :
+          ) : (
             <ExplanationPaginator
               explanationList={this.props.explanationList}
               generateExplanationDate={this.generateExplanationDate}
@@ -355,13 +363,15 @@ export default class ExplanationList extends Component {
               originChip={false}
               perPageItems={4}
             />
-          }
+          )}
         </List>
         <Drawer
-          anchor='right'
+          anchor="right"
           open={this.state.drawerIsOpen}
-          onClose={(e) => { this.handleDrawerClose(e) }}
-          PaperProps={{ style: { width: '80%' } }}
+          onClose={(e) => {
+            this.handleDrawerClose(e);
+          }}
+          PaperProps={{ style: { width: "80%" } }}
           className={`app-explanation-drawer`}
         >
           <DialogTitle>
@@ -370,31 +380,46 @@ export default class ExplanationList extends Component {
               <button
                 type="button"
                 className="btn-close btn-close-white"
-                onClick={(e) => { this.handleDrawerClose(e) }}
+                onClick={(e) => {
+                  this.handleDrawerClose(e);
+                }}
               />
             </Box>
           </DialogTitle>
-          {this.state.activeVisualization === undefined ?
-            <div className='w-100'>Currently there are no generated explanation</div>
-            :
+          {this.state.activeVisualization === undefined ? (
+            <div className="w-100">
+              Currently there are no generated explanation
+            </div>
+          ) : (
             <div className="w-100 row mt-4 pt-4 mb-0 model-common justify-content-center">
               <Box className="col-8 col-lg-8">
                 <ExplanationDetails data={this.state.activeVisualization} />
-                <GlobalExplanation color="purple" data={this.state.activeVisualization} />
-                <DualExplanation color="green" data={this.state.activeVisualization} />
+                <GlobalExplanation
+                  color="purple"
+                  data={this.state.activeVisualization}
+                />
+                <DualExplanation
+                  color="green"
+                  data={this.state.activeVisualization}
+                />
               </Box>
             </div>
-          }
+          )}
         </Drawer>
         <Snackbar
           open={this.state.snackbarIsOpen}
           autoHideDuration={3000}
           onClose={this.handleSnackbarClose}
-          anchorOrigin={{ vertical: `${configs.snackbarVerticalPosition}`, horizontal: `${configs.snackbarHorizontalPostion}` }}>
+          anchorOrigin={{
+            vertical: `${configs.snackbarVerticalPosition}`,
+            horizontal: `${configs.snackbarHorizontalPostion}`,
+          }}
+        >
           <Alert
             onClose={this.handleSnackbarClose}
             severity={this.state.snackbarType}
-            sx={{ width: '100%' }}>
+            sx={{ width: "100%" }}
+          >
             {this.state.snackbarMessage.toString()}
           </Alert>
         </Snackbar>

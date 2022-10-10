@@ -19,7 +19,7 @@ function paginator(items, current_page, per_page_items) {
     next_page: total_pages > page ? page + 1 : null,
     total: items.length,
     total_pages: total_pages,
-    data: paginatedItems
+    data: paginatedItems,
   };
 }
 
@@ -31,40 +31,47 @@ const ExplanationPaginator = (props) => {
 
   return (
     <>
-      {props.explanationList.length > 0 ?
+      {props.explanationList.length > 0 ? (
         <>
-          {paginator(props.explanationList, page, props.perPageItems).data.map((explanation, index) => {
-            return (
-              <ExplanationListItem
-                key={props.generateModalId(explanation)}
-                explanationName={explanation}
-                explanationId={props.generateModalId(explanation)}
-                explanationDate={props.generateExplanationDate(explanation)}
-                handleDelete={props.handleDelete}
-                handleDownload={props.handleDownload}
-                handleVisualize={props.handleVisualize}
-                originChip={props.originChip} />
-            );
-          })}
+          {paginator(props.explanationList, page, props.perPageItems).data.map(
+            (explanation, index) => {
+              return (
+                <ExplanationListItem
+                  key={props.generateModalId(explanation)}
+                  explanationName={explanation}
+                  explanationId={props.generateModalId(explanation)}
+                  explanationDate={props.generateExplanationDate(explanation)}
+                  handleDelete={props.handleDelete}
+                  handleDownload={props.handleDownload}
+                  handleVisualize={props.handleVisualize}
+                  originChip={props.originChip}
+                />
+              );
+            }
+          )}
           <Box
             style={{ display: "flex", justifyContent: "center" }}
-            sx={{ marginY: "20px" }}>
+            sx={{ marginY: "20px" }}
+          >
             <Pagination
               className="app-paginator"
-              count={paginator(props.explanationList, page, props.perPageItems).total_pages}
-              page={paginator(props.explanationList, page, props.perPageItems).page}
+              count={
+                paginator(props.explanationList, page, props.perPageItems)
+                  .total_pages
+              }
+              page={
+                paginator(props.explanationList, page, props.perPageItems).page
+              }
               onChange={handleChange}
               variant="contained"
             />
           </Box>
         </>
-        :
-        <Box className='p-3'>
-          Currently there are no Explanations Available
-        </Box>
-      }
+      ) : (
+        <Box className="p-3">Currently there are no Explanations Available</Box>
+      )}
     </>
   );
-}
+};
 
 export default ExplanationPaginator;

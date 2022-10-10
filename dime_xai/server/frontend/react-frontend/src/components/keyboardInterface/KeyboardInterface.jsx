@@ -1,6 +1,6 @@
-import { Input, TextField } from '@mui/material';
-import React, { Component } from 'react';
-import PropTypes, { number, string } from 'prop-types';
+import { Input, TextField } from "@mui/material";
+import React, { Component } from "react";
+import PropTypes, { number, string } from "prop-types";
 
 export default class KeyboardInput extends Component {
   constructor(props) {
@@ -16,10 +16,12 @@ export default class KeyboardInput extends Component {
 
     // refs
     const utilizeFocus = () => {
-      const ref = React.createRef()
-      const setFocus = () => { ref.current && ref.current.focus() }
-      return { setFocus, ref }
-    }
+      const ref = React.createRef();
+      const setFocus = () => {
+        ref.current && ref.current.focus();
+      };
+      return { setFocus, ref };
+    };
     this.inputRef = utilizeFocus();
 
     // handlers
@@ -60,10 +62,16 @@ export default class KeyboardInput extends Component {
   handleInputKeyPress(event) {
     let keyCode = event.keyCode ? event.keyCode : event.which;
     if (this.state.language === "si") {
-      if ((keyCode >= 32 && keyCode <= 126) && ([37, 38, 39, 40].indexOf(keyCode) === -1)) {
-        this.setState({
-          previousText: this.state.previousText + String.fromCharCode(keyCode),
-        },
+      if (
+        keyCode >= 32 &&
+        keyCode <= 126 &&
+        [37, 38, 39, 40].indexOf(keyCode) === -1
+      ) {
+        this.setState(
+          {
+            previousText:
+              this.state.previousText + String.fromCharCode(keyCode),
+          }
           // // callback has been disabled for boosting performance. re-enable to debug if required
           // () => {
           //   console.log("Accumilated: " + this.state.previousText);
@@ -101,10 +109,16 @@ export default class KeyboardInput extends Component {
           // const selectedText = currentValue.substring(startPos, endPos);
 
           this.setState({
-            outOfScopeText: currentValue.substring(0, startPos) + currentValue.substring(endPos),
+            outOfScopeText:
+              currentValue.substring(0, startPos) +
+              currentValue.substring(endPos),
           });
         }
-      } else if ((keyCode >= 32 && keyCode <= 126) && ([37, 38, 39, 40].indexOf(keyCode) === -1)) {
+      } else if (
+        keyCode >= 32 &&
+        keyCode <= 126 &&
+        [37, 38, 39, 40].indexOf(keyCode) === -1
+      ) {
         if (selectedText) {
           this.setState({
             previousText: "",
@@ -113,10 +127,15 @@ export default class KeyboardInput extends Component {
           const startPos = this.inputRef.ref.current.selectionStart;
           const endPos = this.inputRef.ref.current.selectionEnd;
           // const selectedText = currentValue.substring(startPos, endPos);
-          this.inputRef.ref.current.setSelectionRange(currentValue.length, startPos);
+          this.inputRef.ref.current.setSelectionRange(
+            currentValue.length,
+            startPos
+          );
 
           this.setState({
-            outOfScopeText: currentValue.substring(0, startPos) + currentValue.substring(endPos),
+            outOfScopeText:
+              currentValue.substring(0, startPos) +
+              currentValue.substring(endPos),
           });
         }
       }
@@ -154,7 +173,10 @@ export default class KeyboardInput extends Component {
       }
     }
 
-    if (17 in this.state.shortcutKeyStore && Number(this.props.shortcutKey) in this.state.shortcutKeyStore) {
+    if (
+      17 in this.state.shortcutKeyStore &&
+      Number(this.props.shortcutKey) in this.state.shortcutKeyStore
+    ) {
       if (shortcutKeyHandler !== null && shortcutKeyHandler !== undefined) {
         if (this.state.language === "si") {
           shortcutKeyHandler("en");
@@ -165,13 +187,13 @@ export default class KeyboardInput extends Component {
         if (this.state.language === "si") {
           this.setState({
             outOfScopeText: "",
-            language: "en"
+            language: "en",
           });
         } else {
           this.setState({
             previousText: "",
             outOfScopeText: this.state.text,
-            language: "si"
+            language: "si",
           });
         }
       }
@@ -179,7 +201,7 @@ export default class KeyboardInput extends Component {
   }
 
   handleInputKeyUp(event) {
-    var keyCode = (event.keyCode ? event.keyCode : event.which);
+    var keyCode = event.keyCode ? event.keyCode : event.which;
     let shortcutKeyStore = this.state.shortcutKeyStore;
     delete shortcutKeyStore[keyCode];
     this.setState({
@@ -188,62 +210,237 @@ export default class KeyboardInput extends Component {
 
     // Only activates if the language is Sinhala
     if (this.state.language === "si") {
-      this.setState({
-        newText: this.handleConvert(this.state.previousText),
-      }, () => {
-        this.setState({
-          text: this.state.outOfScopeText + this.state.newText,
-        }, () => {
-          if (this.props.handleTextChange !== null && this.props.handleTextChange !== undefined) {
-            this.props.handleTextChange(this.state.text);
-          }
-        });
-      });
+      this.setState(
+        {
+          newText: this.handleConvert(this.state.previousText),
+        },
+        () => {
+          this.setState(
+            {
+              text: this.state.outOfScopeText + this.state.newText,
+            },
+            () => {
+              if (
+                this.props.handleTextChange !== null &&
+                this.props.handleTextChange !== undefined
+              ) {
+                this.props.handleTextChange(this.state.text);
+              }
+            }
+          );
+        }
+      );
     }
   }
 
   handleConvert(text) {
     // Vowel Keys and Maps
     let sinhala_vowels_keys = [
-      "uu", "oo", "oe", "aa", "AA", "Aa", "ae", "ii", "ie", "ee", "ea",
-      "ei", "uu", "au", "O", "a", "A", "i", "e", "u", "U", "o", "E", "I",
+      "uu",
+      "oo",
+      "oe",
+      "aa",
+      "AA",
+      "Aa",
+      "ae",
+      "ii",
+      "ie",
+      "ee",
+      "ea",
+      "ei",
+      "uu",
+      "au",
+      "O",
+      "a",
+      "A",
+      "i",
+      "e",
+      "u",
+      "U",
+      "o",
+      "E",
+      "I",
     ];
     let sinhala_vowel_pure_map = {
-      uu: "ඌ", oo: "ඕ", oe: "ඕ", aa: "ආ", AA: "ඈ", Aa: "ඈ", ae: "ඈ", ii: "ඊ", ie: "ඊ", ee: "ඒ", ea: "ඒ",
-      ei: "ඒ", au: "ඖ", O: "ඖ", a: "අ", A: "ඇ", i: "ඉ", e: "එ", u: "උ", U: "උ", o: "ඔ", E: "ඓ", I: "ඓ",
+      uu: "ඌ",
+      oo: "ඕ",
+      oe: "ඕ",
+      aa: "ආ",
+      AA: "ඈ",
+      Aa: "ඈ",
+      ae: "ඈ",
+      ii: "ඊ",
+      ie: "ඊ",
+      ee: "ඒ",
+      ea: "ඒ",
+      ei: "ඒ",
+      au: "ඖ",
+      O: "ඖ",
+      a: "අ",
+      A: "ඇ",
+      i: "ඉ",
+      e: "එ",
+      u: "උ",
+      U: "උ",
+      o: "ඔ",
+      E: "ඓ",
+      I: "ඓ",
     };
     let sinhala_vowel_suffix_map = {
-      uu: "ූ", oo: "ෝ", oe: "ෝ", aa: "ා", AA: "ෑ", Aa: "ෑ", ae: "ෑ", ii: "ී", ie: "ී", ee: "ේ", ea: "ේ",
-      ei: "ේ", au: "ෞ", O: "ෞ", a: "", A: "ැ", i: "ි", e: "ෙ", u: "ු", o: "ො", E: "ෛ", I: "ෛ",
+      uu: "ූ",
+      oo: "ෝ",
+      oe: "ෝ",
+      aa: "ා",
+      AA: "ෑ",
+      Aa: "ෑ",
+      ae: "ෑ",
+      ii: "ී",
+      ie: "ී",
+      ee: "ේ",
+      ea: "ේ",
+      ei: "ේ",
+      au: "ෞ",
+      O: "ෞ",
+      a: "",
+      A: "ැ",
+      i: "ි",
+      e: "ෙ",
+      u: "ු",
+      o: "ො",
+      E: "ෛ",
+      I: "ෛ",
     };
 
     // Non-joining Character Keys and Maps [ + '\u200D']
-    let sinhala_nonjoining_keys = [
-      "RR", "z", "x", "H", "R"
-    ];
+    let sinhala_nonjoining_keys = ["RR", "z", "x", "H", "R"];
     let sinhala_nonjoining_map = {
-      RR: "ඎ", z: "ර්\u200D", x: "ං", H: "ඃ", R: "ඍ",
+      RR: "ඎ",
+      z: "ර්\u200D",
+      x: "ං",
+      H: "ඃ",
+      R: "ඍ",
     };
 
     // Consonent Keys and Maps
     let sinhala_consonent_keys = [
-      "nndh", "nnd", "nng", "mmb", "GN", "KN", "Lu", "Th", "Dh", "gh", "Ch", "ph", "kh", "bh", "Sh", "sh",
-      "dh", "ch", "th", "N", "L", "K", "G", "T", "D", "P", "B", "C", "X", "J", "t", "k", "d", "n", "p",
-      "b", "m", "M", "Y", "y", "j", "l", "v", "w", "V", "W", "s", "S", "h", "f", "F", "g", "c", "r",
+      "nndh",
+      "nnd",
+      "nng",
+      "mmb",
+      "GN",
+      "KN",
+      "Lu",
+      "Th",
+      "Dh",
+      "gh",
+      "Ch",
+      "ph",
+      "kh",
+      "bh",
+      "Sh",
+      "sh",
+      "dh",
+      "ch",
+      "th",
+      "N",
+      "L",
+      "K",
+      "G",
+      "T",
+      "D",
+      "P",
+      "B",
+      "C",
+      "X",
+      "J",
+      "t",
+      "k",
+      "d",
+      "n",
+      "p",
+      "b",
+      "m",
+      "M",
+      "Y",
+      "y",
+      "j",
+      "l",
+      "v",
+      "w",
+      "V",
+      "W",
+      "s",
+      "S",
+      "h",
+      "f",
+      "F",
+      "g",
+      "c",
+      "r",
     ];
     let sinhala_consonant_map = {
-      nndh: "ඳ", nnd: "ඬ", nng: "ඟ", mmb: "ඹ", GN: "ඥ", KN: "ඤ", Lu: "ළු", Th: "ථ", Dh: "ධ", gh: "ඝ",
-      Ch: "ඡ", ph: "ඵ", kh: "ඛ", bh: "භ", Sh: "ෂ", sh: "ශ", dh: "ද", ch: "ච", th: "ත", N: "ණ", L: "ළ",
-      K: "ඛ", G: "ඝ", T: "ඨ", D: "ඪ", P: "ඵ", B: "භ", C: "ඡ", X: "ඞ", J: "ඣ", t: "ට", k: "ක", d: "ඩ",
-      n: "න", p: "ප", b: "බ", m: "ම", M: "ම", Y: "ය", y: "ය", j: "ජ", l: "ල", v: "ව", w: "ව", V: "ව",
-      W: "ව", s: "ස", S: "ස", h: "හ", f: "ෆ", F: "ෆ", g: "ග", c: "ච", r: "ර",
+      nndh: "ඳ",
+      nnd: "ඬ",
+      nng: "ඟ",
+      mmb: "ඹ",
+      GN: "ඥ",
+      KN: "ඤ",
+      Lu: "ළු",
+      Th: "ථ",
+      Dh: "ධ",
+      gh: "ඝ",
+      Ch: "ඡ",
+      ph: "ඵ",
+      kh: "ඛ",
+      bh: "භ",
+      Sh: "ෂ",
+      sh: "ශ",
+      dh: "ද",
+      ch: "ච",
+      th: "ත",
+      N: "ණ",
+      L: "ළ",
+      K: "ඛ",
+      G: "ඝ",
+      T: "ඨ",
+      D: "ඪ",
+      P: "ඵ",
+      B: "භ",
+      C: "ඡ",
+      X: "ඞ",
+      J: "ඣ",
+      t: "ට",
+      k: "ක",
+      d: "ඩ",
+      n: "න",
+      p: "ප",
+      b: "බ",
+      m: "ම",
+      M: "ම",
+      Y: "ය",
+      y: "ය",
+      j: "ජ",
+      l: "ල",
+      v: "ව",
+      w: "ව",
+      V: "ව",
+      W: "ව",
+      s: "ස",
+      S: "ස",
+      h: "හ",
+      f: "ෆ",
+      F: "ෆ",
+      g: "ග",
+      c: "ච",
+      r: "ර",
     };
     // consonantsUni[14] = 'ළු' is handled automatically through Unicode
 
     // Special Character Keys and Maps
     let sinhala_special_keys = ["ruu", "ru"];
     let sinhala_special_map = {
-      ruu: "ෲ", ru: "ෘ",
+      ruu: "ෲ",
+      ru: "ෘ",
     };
 
     let EN_pattern, SI_pattern, RegEx_pattern;
@@ -319,13 +516,13 @@ export default class KeyboardInput extends Component {
     if (language === "en") {
       this.setState({
         outOfScopeText: "",
-        language: "en"
+        language: "en",
       });
     } else {
       this.setState({
         previousText: "",
         outOfScopeText: this.state.text,
-        language: "si"
+        language: "si",
       });
     }
   }
@@ -353,13 +550,16 @@ export default class KeyboardInput extends Component {
   }
 
   handleInputChange(event, inputChangeHandler) {
-    this.setState({
-      text: event.target.value,
-    }, () => {
-      if (inputChangeHandler !== null && inputChangeHandler !== undefined) {
-        inputChangeHandler(event);
+    this.setState(
+      {
+        text: event.target.value,
+      },
+      () => {
+        if (inputChangeHandler !== null && inputChangeHandler !== undefined) {
+          inputChangeHandler(event);
+        }
       }
-    });
+    );
   }
 
   handleInputReset() {
@@ -369,7 +569,6 @@ export default class KeyboardInput extends Component {
       newText: "",
       outOfScopeText: "",
     });
-
   }
 
   handleInputFocus() {
@@ -377,61 +576,82 @@ export default class KeyboardInput extends Component {
   }
 
   render() {
-    return (
-      this.props.interface === "textfield" ?
-        (
-          <TextField
-            id={this.props.id}
-            name={this.props.name}
-            type={this.props.type}
-            inputProps={this.props.inputProps}
-            margin={this.props.margin}
-            className={" " + this.props.className}
-            hiddenLabel={this.props.hiddenLabel}
-            label={this.props.label}
-            size={this.props.size}
-            variant={this.props.variant}
-            autoFocus={this.props.autoFocus}
-            inputRef={this.inputRef.ref}
-            error={this.props.error}
-            helperText={this.props.helperText}
-            value={this.state.text}
-            defaultValue={this.props.defaultValue}
-            placeholder={this.props.placeholder}
-            onChange={(e) => { this.handleInputChange(e, this.props?.handleChange || null) }}
-            onKeyDown={(e) => { this.handleInputKeyDown(e, this.props?.handleEnter || null, this.props?.handleShortcut || null) }}
-            onKeyUp={(e) => { this.handleInputKeyUp(e) }}
-            onKeyPress={(e) => { this.handleInputKeyPress(e) }}
-            disabled={this.props.disabled}
-            required={this.props.required}
-            fullWidth={this.props.fullWidth} />
-        )
-        :
-        (
-          <Input
-            id={this.props.id}
-            name={this.props.name}
-            type={this.props.type}
-            inputProps={this.props.inputProps}
-            margin={this.props.margin}
-            placeholder={this.props?.placeholder || "Type a message here..."}
-            className={" " + this.props.className}
-            color={this.props.color || "secondary"}
-            size={this.props.size}
-            disableUnderline={this.props.disableUnderline || false}
-            inputRef={this.inputRef.ref}
-            error={this.props.error}
-            autoFocus={this.props.autoFocus}
-            value={this.state.text}
-            defaultValue={this.props.defaultValue}
-            onChange={(e) => { this.handleInputChange(e, this.props?.handleChange || null) }}
-            onKeyDown={(e) => { this.handleInputKeyDown(e, this.props?.handleEnter || null, this.props?.handleShortcut || null) }}
-            onKeyUp={(e) => { this.handleInputKeyUp(e) }}
-            onKeyPress={(e) => { this.handleInputKeyPress(e) }}
-            disabled={this.props.disabled}
-            required={this.props.required}
-            fullWidth={this.props.fullWidth} />
-        )
+    return this.props.interface === "textfield" ? (
+      <TextField
+        id={this.props.id}
+        name={this.props.name}
+        type={this.props.type}
+        inputProps={this.props.inputProps}
+        margin={this.props.margin}
+        className={" " + this.props.className}
+        hiddenLabel={this.props.hiddenLabel}
+        label={this.props.label}
+        size={this.props.size}
+        variant={this.props.variant}
+        autoFocus={this.props.autoFocus}
+        inputRef={this.inputRef.ref}
+        error={this.props.error}
+        helperText={this.props.helperText}
+        value={this.state.text}
+        defaultValue={this.props.defaultValue}
+        placeholder={this.props.placeholder}
+        onChange={(e) => {
+          this.handleInputChange(e, this.props?.handleChange || null);
+        }}
+        onKeyDown={(e) => {
+          this.handleInputKeyDown(
+            e,
+            this.props?.handleEnter || null,
+            this.props?.handleShortcut || null
+          );
+        }}
+        onKeyUp={(e) => {
+          this.handleInputKeyUp(e);
+        }}
+        onKeyPress={(e) => {
+          this.handleInputKeyPress(e);
+        }}
+        disabled={this.props.disabled}
+        required={this.props.required}
+        fullWidth={this.props.fullWidth}
+      />
+    ) : (
+      <Input
+        id={this.props.id}
+        name={this.props.name}
+        type={this.props.type}
+        inputProps={this.props.inputProps}
+        margin={this.props.margin}
+        placeholder={this.props?.placeholder || "Type a message here..."}
+        className={" " + this.props.className}
+        color={this.props.color || "secondary"}
+        size={this.props.size}
+        disableUnderline={this.props.disableUnderline || false}
+        inputRef={this.inputRef.ref}
+        error={this.props.error}
+        autoFocus={this.props.autoFocus}
+        value={this.state.text}
+        defaultValue={this.props.defaultValue}
+        onChange={(e) => {
+          this.handleInputChange(e, this.props?.handleChange || null);
+        }}
+        onKeyDown={(e) => {
+          this.handleInputKeyDown(
+            e,
+            this.props?.handleEnter || null,
+            this.props?.handleShortcut || null
+          );
+        }}
+        onKeyUp={(e) => {
+          this.handleInputKeyUp(e);
+        }}
+        onKeyPress={(e) => {
+          this.handleInputKeyPress(e);
+        }}
+        disabled={this.props.disabled}
+        required={this.props.required}
+        fullWidth={this.props.fullWidth}
+      />
     );
   }
 }

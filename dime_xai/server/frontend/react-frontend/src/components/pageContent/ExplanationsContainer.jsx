@@ -1,6 +1,6 @@
-import { Box } from '@mui/material';
-import React, { Component } from 'react';
-import ExplanationList from './ExplanationList';
+import { Box } from "@mui/material";
+import React, { Component } from "react";
+import ExplanationList from "./ExplanationList";
 
 export default class ExplanationsContainer extends Component {
   render() {

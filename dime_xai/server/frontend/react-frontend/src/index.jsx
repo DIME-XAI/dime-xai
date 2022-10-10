@@ -1,9 +1,11 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
 
-const root = ReactDOM.createRoot(document.getElementById('reactFrontendContainer'));
+const root = ReactDOM.createRoot(
+  document.getElementById("reactFrontendContainer")
+);
 root.render(
   <React.StrictMode>
     <App
@@ -11,6 +13,7 @@ root.render(
       appTheme={window.appTheme.toString().toLowerCase() || "dark"}
       appEnv={window.appEnv.toString().toLowerCase() || "prod"}
       appSinhala={Boolean(window.appSinhala) || true}
+      appVersion={window.appVersion || "N/A"}
     />
   </React.StrictMode>
 );

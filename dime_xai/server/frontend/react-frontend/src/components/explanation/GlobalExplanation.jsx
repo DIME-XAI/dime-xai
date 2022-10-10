@@ -1,8 +1,14 @@
-import React from 'react';
-import ExplanationBar from './ExplanationBar';
-import { Accordion, AccordionDetails, AccordionSummary, Box, Typography } from '@mui/material';
-import { ExpandMore } from '@mui/icons-material';
-import TwoColDataTable from '../dataTable/TwoColDataTable';
+import React from "react";
+import ExplanationBar from "./ExplanationBar";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Typography,
+} from "@mui/material";
+import { ExpandMore } from "@mui/icons-material";
+import TwoColDataTable from "../dataTable/TwoColDataTable";
 
 class GlobalExplanation extends React.Component {
   constructor(props) {
@@ -15,15 +21,29 @@ class GlobalExplanation extends React.Component {
   }
 
   render() {
-    let globalScores = Object.keys(this.state.data.dual[0].global.probability_scores).map((key, index) =>
+    let globalScores = Object.keys(
+      this.state.data.dual[0].global.probability_scores
+    ).map((key, index) => (
       <ExplanationBar
         key={key}
-        sliderValue={Number((Number(this.state.data.dual[0].global.probability_scores[key]) * 100).toFixed(2)).toString() + "%"}
+        sliderValue={
+          Number(
+            (
+              Number(this.state.data.dual[0].global.probability_scores[key]) *
+              100
+            ).toFixed(2)
+          ).toString() + "%"
+        }
         token={key.toString()}
-        color={this.state.color} />
+        color={this.state.color}
+      />
+    ));
+    let allFeatures = Object.keys(
+      this.props.data.dual[0].global.probability_scores
     );
-    let allFeatures = Object.keys(this.props.data.dual[0].global.probability_scores);
-    let selectedFeatures = Object.keys(this.props.data.dual[0].global.feature_selection);
+    let selectedFeatures = Object.keys(
+      this.props.data.dual[0].global.feature_selection
+    );
     let ignoredFeatures = {};
 
     if (allFeatures.length - selectedFeatures.length > 0) {
@@ -36,9 +56,13 @@ class GlobalExplanation extends React.Component {
       ignoredFeatures = {};
     }
     let featureData = {
-      "Tokens Selected": selectedFeatures.length > 0 ? selectedFeatures.join(", ") : "None",
-      "Tokens Ignored": (allFeatures.length - selectedFeatures.length) > 0 ? Object.keys(ignoredFeatures).join(", ") : "None"
-    }
+      "Tokens Selected":
+        selectedFeatures.length > 0 ? selectedFeatures.join(", ") : "None",
+      "Tokens Ignored":
+        allFeatures.length - selectedFeatures.length > 0
+          ? Object.keys(ignoredFeatures).join(", ")
+          : "None",
+    };
 
     return (
       <Box className="mb-5">
@@ -46,7 +70,8 @@ class GlobalExplanation extends React.Component {
           variant="h6"
           gutterBottom
           component="div"
-          sx={{ fontWeight: 'medium' }} >
+          sx={{ fontWeight: "medium" }}
+        >
           Global Feature Importance
         </Typography>
         <Box className="mb-4">
@@ -63,21 +88,21 @@ class GlobalExplanation extends React.Component {
             </tbody>
           </table>
         </Box>
-        <Box className="mb-4">
-          {globalScores}
-        </Box>
+        <Box className="mb-4">{globalScores}</Box>
         <Box className="mb-5">
           <Accordion className="explanation-accordian explanation-accordian-global">
             <AccordionSummary
               expandIcon={<ExpandMore />}
               aria-controls="panel1a-content"
-              id="panel1a-header">
+              id="panel1a-header"
+            >
               <Typography>Raw Global Feature Imporance Scores</Typography>
             </AccordionSummary>
             <AccordionDetails>
               <TwoColDataTable
                 data={this.props.data.dual[0].global.feature_importance}
-                classNames="app-table-global" />
+                classNames="app-table-global"
+              />
             </AccordionDetails>
           </Accordion>
           <Accordion className="explanation-accordian explanation-accordian-global">
@@ -91,7 +116,8 @@ class GlobalExplanation extends React.Component {
             <AccordionDetails>
               <TwoColDataTable
                 data={featureData}
-                classNames="app-table-global" />
+                classNames="app-table-global"
+              />
             </AccordionDetails>
           </Accordion>
         </Box>

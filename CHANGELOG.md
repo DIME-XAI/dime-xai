@@ -2,10 +2,21 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/) starting with version 0.0.1a1
 
+## [1.1.2] - 2022-10-09
+### Improvements
+- enabled `data_source_path` argument passing in `process queue`
+- explanations UI improvements
+
+### Bugfixes
+- refined constant definitions
+- fixed version inconsistency in the UI by fetching the version directly from the backend configurations
+- fixed frontend doc url inconsistencies by defining them in the backend
+- fixed api url inconsistencies by defining them in the backend 
+
 ## [1.1.1] - 2022-09-18
 ### Improvements
-- Removed custom dir and moved dime_diet_classifier to a dir called 'dime_components' in init dir list
-- Improved favicon support and the manifest
+- removed custom dir and moved dime_diet_classifier to a dir called 'dime_components' in init dir list
+- improved favicon support and the manifest
 - UI Improvements
 
 ### Bugfixes

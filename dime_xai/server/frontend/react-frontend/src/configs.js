@@ -1,8 +1,6 @@
-let api = "http://localhost:6066"; 
-//"http://localhost:6066";
+let api = ""; //"http://localhost:6066";
 
 let dimeDocsHost = "https://dime-xai.github.io";
-// https://kolloqe.github.io/
 
 export const configs = {
   api: api,

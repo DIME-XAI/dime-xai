@@ -19,7 +19,7 @@ function paginator(items, current_page, per_page_items) {
     next_page: total_pages > page ? page + 1 : null,
     total: items.length,
     total_pages: total_pages,
-    data: paginatedItems
+    data: paginatedItems,
   };
 }
 
@@ -31,38 +31,44 @@ const ModelPaginator = (props) => {
 
   return (
     <>
-      {props.modelList.length > 0 ?
+      {props.modelList.length > 0 ? (
         <>
-          {paginator(props.modelList, page, props.perPageItems).data.map((model, index) => {
-            return (
-              <ModelListItem
-                key={props.generateModalId(model.name)}
-                modelName={model.name}
-                modelSize={model.size}
-                modelId={props.generateModalId(model.name)}
-                compatibilityChip={false}
-                handleDelete={props.handleDelete} />
-            );
-          })}
+          {paginator(props.modelList, page, props.perPageItems).data.map(
+            (model, index) => {
+              return (
+                <ModelListItem
+                  key={props.generateModalId(model.name)}
+                  modelName={model.name}
+                  modelSize={model.size}
+                  modelId={props.generateModalId(model.name)}
+                  compatibilityChip={false}
+                  handleDelete={props.handleDelete}
+                />
+              );
+            }
+          )}
           <Box
             style={{ display: "flex", justifyContent: "center" }}
-            sx={{ marginY: "20px" }}>
+            sx={{ marginY: "20px" }}
+          >
             <Pagination
               className="app-paginator"
-              count={paginator(props.modelList, page, props.perPageItems).total_pages}
+              count={
+                paginator(props.modelList, page, props.perPageItems).total_pages
+              }
               page={paginator(props.modelList, page, props.perPageItems).page}
               onChange={handleChange}
               variant="contained"
             />
           </Box>
         </>
-        :
-        <Box className='p-3'>
+      ) : (
+        <Box className="p-3">
           Currently there are no Trained Models Available
         </Box>
-      }
+      )}
     </>
   );
-}
+};
 
 export default ModelPaginator;

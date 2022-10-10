@@ -3,11 +3,13 @@ from typing import Optional, Text
 
 PACKAGE_NAME = "dime"
 PACKAGE_NAME_PYPI = "dime_xai"
-PACKAGE_VERSION = "1.1.1"
+PACKAGE_VERSION = "1.1.2"
 PACKAGE_VERSION_LONG = f'DIME Version:{PACKAGE_VERSION}\n[Supported RASA Version:\t2.8.x]'
 RASA_CORE_VERSION = "2.8.8"
 RASA_SDK_VERSION = "2.8.4"
 LANGUAGES_SUPPORTED = ['en', 'si']
+README_PYPI = "READMEPyPI.md"
+REQUIREMENTS = "requirements.txt"
 
 DEFAULT_DATA_PATH = "./data"
 FILE_READ_PERMISSION = "r"
