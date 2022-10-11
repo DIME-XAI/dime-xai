@@ -12,9 +12,9 @@ root.render(
       notify={false}
       appTheme={window.appTheme.toString().toLowerCase() || "dark"}
       appEnv={window.appEnv.toString().toLowerCase() || "prod"}
-      appSinhala={Boolean(window.appSinhala) || true}
+      appSinhala={window?.appSinhala.toString().toLowerCase() === "false" ? false : true || true}
       appVersion={window.appVersion || "N/A"}
-      secureUrl={Boolean(window.secureUrl) || true}
+      secureUrl={window?.secureUrl.toString().toLowerCase() === "false" ? false : true || true}
     />
   </React.StrictMode>
 );
