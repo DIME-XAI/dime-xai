@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/) starting with version 0.0.1a1
 
+## [1.2.1] - 2022-10-11
+### Bugfixes
+- fixed a bug that prevented toggling the `secure_url` option via `.env`
+
 ## [1.2.0] - 2022-10-11
 ### Improvements
 - added the support for toggle between `HTTP` and `HTTPS` for securing `bot URL` when explaining models via `REST API`
