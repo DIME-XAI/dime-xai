@@ -55,6 +55,7 @@ export default class ConfigForm extends Component {
         models_path: "notset",
         url_endpoint: "notset",
       },
+      secureUrl: props.secureUrl,
     };
     this.botURLRef = React.createRef();
     this.dataPathRef = React.createRef();
@@ -144,6 +145,7 @@ export default class ConfigForm extends Component {
     }
     let payload = {
       updated_configs: this.state.configs,
+      secure_url: this.state.secureUrl
     };
 
     this.setState({

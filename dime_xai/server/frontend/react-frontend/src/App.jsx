@@ -178,6 +178,7 @@ export default class App extends React.Component {
                     element={
                       <Dashboard
                         appConfigs={this.state.appConfigs}
+                        secureUrl={this.props.secureUrl}
                         showAppNotification={this.showAppNotification}
                         hideAppNotification={this.hideAppNotification}
                         scrollToTop={this.scrollToTop}

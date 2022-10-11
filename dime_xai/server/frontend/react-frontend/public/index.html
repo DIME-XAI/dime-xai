@@ -56,15 +56,16 @@
         window.appEnv = "{{ config['APP_ENV'] }}";
         window.appSinhala = "{{ config['SINHALA_ENABLED'] }}";
         window.appVersion = "{{ config['VERSION'] }}";
+        window.secureUrl = "{{ config['SECURE_BOT_URL'] }}";
       </script>
       <script
         type="text/javascript"
         src="%PUBLIC_URL%\res\scripts\bootstrap.min.js"
       ></script>
-      <script
+      <!-- <script
         type="text/javascript"
         src="%PUBLIC_URL%\res\scripts\jquery-3.6.0.min.js"
-      ></script>
+      ></script> -->
     </div>
   </body>
 </html>

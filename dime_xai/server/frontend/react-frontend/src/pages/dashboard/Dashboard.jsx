@@ -76,6 +76,7 @@ export default class Dashboard extends Component {
           />
           <DashboardPageTabsExplanations
             appConfigs={this.props.appConfigs}
+            secureUrl={this.props.secureUrl}
             showAppNotification={this.props.showAppNotification}
             hideAppNotification={this.props.hideAppNotification}
             scrollToTop={this.props.scrollToTop}

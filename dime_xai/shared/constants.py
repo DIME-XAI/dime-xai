@@ -3,7 +3,7 @@ from typing import Optional, Text
 
 PACKAGE_NAME = "dime"
 PACKAGE_NAME_PYPI = "dime_xai"
-PACKAGE_VERSION = "1.1.3"
+PACKAGE_VERSION = "1.2.0"
 PACKAGE_VERSION_LONG = f'DIME Version:{PACKAGE_VERSION}\n[Supported RASA Version:\t2.8.x]'
 RASA_CORE_VERSION = "2.8.8"
 RASA_SDK_VERSION = "2.8.4"
@@ -103,6 +103,7 @@ DEFAULT_DIME_SERVER_PORT = 6066
 DEFAULT_DIME_SERVER_LOCALHOST_DEC = "0.0.0.0"
 DEFAULT_DIME_SERVER_LOCALHOST = "localhost"
 BOT_URL_REGEX = r"^(https?:\/\/((localhost)|(0.0.0.0)|(127.0.0.1)):[\d]{4}([a-zA-Z\d\-\/\#\_\$\@]+)?)|(https:\/\/[a-zA-Z\d\-\/\#\_\$\@]+\.[a-zA-Z\d\-\/\#\_\$\@]+\.[a-zA-Z\d\-\/\#\_\$\@]+(:[\d]{4})?([a-zA-Z\d\-\/\#\_\$\@]+)?)$"
+BOT_URL_REGEX_HTTP = r"^(https?:\/\/((localhost)|(0.0.0.0)|(127.0.0.1)):[\d]{4}([a-zA-Z\d\-\/\#\_\$\@]+)?)|(http(s?):\/\/[a-zA-Z\d\-\/\#\_\$\@]+\.[a-zA-Z\d\-\/\#\_\$\@]+\.[a-zA-Z\d\-\/\#\_\$\@]+(:[\d]{4})?([a-zA-Z\d\-\/\#\_\$\@]+)?|(http(s?):\/\/[a-zA-Z\d\-\/\#\_\$\@]+\.[a-zA-Z\d\-\/\#\_\$\@]+\.[a-zA-Z\d\-\/\#\_\$\@]+(:[\d]{4})?([a-zA-Z\d\-\/\#\_\$\@\.]+)?))$"
 
 # scaffold
 DEFAULT_INIT_SRC_DIR_NAME = "init_dir"

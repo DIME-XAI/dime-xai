@@ -44,6 +44,7 @@ class DIMEServer:
                 "APP_ENV": os.environ.get("APP_ENV") or "prod",
                 "SINHALA_ENABLED": os.environ.get("SINHALA_ENABLED") or True,
                 "VERSION": PACKAGE_VERSION,
+                "SECURE_BOT_URL": os.environ.get("SECURE_BOT_URL") or True,
             }
             create_in_memory_process_queue()
 
