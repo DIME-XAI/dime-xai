@@ -394,7 +394,11 @@ def configs():
         try:
             request_data = request.get_json()
             updated_configs = request_data['updated_configs']
-            validate_status, validate_res = server_configs.validate(configs=updated_configs)
+
+            # passing secure_url via .env
+            secure_url = request_data['secure_url']
+
+            validate_status, validate_res = server_configs.validate(configs=updated_configs, secure_url=secure_url)
             if not validate_status:
                 return {"status": Validity.INVALID, "metadata": validate_res}, 200
 

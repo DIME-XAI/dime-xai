@@ -72,6 +72,7 @@ export default class DashboardPageTabsExplanations extends Component {
               />
               <ConfigTab
                 appConfigs={this.props.appConfigs}
+                secureUrl={this.props.secureUrl}
                 showAppNotification={this.props.showAppNotification}
                 hideAppNotification={this.props.hideAppNotification}
                 scrollToTop={this.props.scrollToTop}

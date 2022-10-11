@@ -12,6 +12,7 @@ from dime_xai.shared.constants import (
     MODEL_MODE_LOCAL,
     MODEL_MODE_REST,
     BOT_URL_REGEX,
+    BOT_URL_REGEX_HTTP,
     Validity,
     ServerConfigType,
     FilePermission,
@@ -71,7 +72,7 @@ class ServerConfigs:
             raise DIMEConfigException(e)
 
     @staticmethod
-    def validate(configs: Dict) -> Tuple[bool, Dict]:
+    def validate(configs: Dict, secure_url: bool = True) -> Tuple[bool, Dict]:
         validate_status_obj = {
             "keys": Validity.NOTSET,
             DIMEConfig.SUB_KEY_BASE_DATA_PATH: Validity.NOTSET,
@@ -137,13 +138,15 @@ class ServerConfigs:
                 validate_status_obj[DIMEConfig.SUB_KEY_BASE_MODEL_NAME] = Validity.VALID
 
             # url endpoint validation
+            bot_url_regex_ = BOT_URL_REGEX if secure_url else BOT_URL_REGEX_HTTP
             if not re.findall(
-                BOT_URL_REGEX,
+                bot_url_regex_,
                 configs[DIMEConfig.SUB_KEY_BASE_URL_ENDPOINT]
             ):
                 logger.error("Failed to validate url endpoint in updated server configs")
                 validate_status_obj[DIMEConfig.SUB_KEY_BASE_URL_ENDPOINT] = Validity.INVALID
             else:
+
                 validate_status_obj[DIMEConfig.SUB_KEY_BASE_URL_ENDPOINT] = Validity.VALID
 
             # ranking length validation

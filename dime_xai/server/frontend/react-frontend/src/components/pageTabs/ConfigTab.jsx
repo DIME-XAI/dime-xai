@@ -98,6 +98,7 @@ export default class ConfigTab extends Component {
             <Box sx={{ marginTop: 5 }}>
               <ConfigForm
                 appConfigs={this.props.appConfigs}
+                secureUrl={this.props.secureUrl}
                 modelList={this.state.modelList}
                 fetchModels={this.fetchModels}
                 fetchStats={this.props.fetchStats}

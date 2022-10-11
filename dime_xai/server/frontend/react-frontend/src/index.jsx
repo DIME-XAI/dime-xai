@@ -14,6 +14,7 @@ root.render(
       appEnv={window.appEnv.toString().toLowerCase() || "prod"}
       appSinhala={Boolean(window.appSinhala) || true}
       appVersion={window.appVersion || "N/A"}
+      secureUrl={Boolean(window.secureUrl) || true}
     />
   </React.StrictMode>
 );
